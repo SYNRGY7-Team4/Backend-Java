@@ -6,9 +6,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import synrgy.team4.backend.model.dto.LoginDTO;
 import synrgy.team4.backend.model.dto.LoginResponseDTO;
+import synrgy.team4.backend.model.dto.RegisterDTO;
 import synrgy.team4.backend.model.dto.UserDTO;
 import synrgy.team4.backend.model.entity.User;
 import synrgy.team4.backend.repository.UserRepository;
+import synrgy.team4.backend.security.jwt.CustomUserDetails;
 import synrgy.team4.backend.security.jwt.service.JwtService;
 import synrgy.team4.backend.service.UserService;
 
@@ -39,7 +41,12 @@ public class AuthController {
         user.setPassword(encoder.encode(user.getPassword()));
         User savedUser = userRepository.save(user);
 
-        return ResponseEntity.status(201).body(savedUser);
+        RegisterDTO registerDTO = new RegisterDTO();
+        registerDTO.setId(savedUser.getId());
+        registerDTO.setName(savedUser.getName());
+        registerDTO.setEmail(savedUser.getEmail());
+
+        return ResponseEntity.status(201).body(registerDTO);
     }
 
     @PostMapping("/login")
@@ -47,7 +54,8 @@ public class AuthController {
         Optional<User> userOptional = userRepository.findByEmail(loginDTO.getEmail());
         if (userOptional.isPresent() && encoder.matches(loginDTO.getPassword(), userOptional.get().getPassword())) {
             User user = userOptional.get();
-            String token = jwtService.generateToken(user);
+            CustomUserDetails customUserDetails = new CustomUserDetails(user);
+            String token = jwtService.generateToken(customUserDetails);
 
             return ResponseEntity.ok().body(new LoginResponseDTO(user.getId(), user.getName(), user.getEmail(), token));
         }
