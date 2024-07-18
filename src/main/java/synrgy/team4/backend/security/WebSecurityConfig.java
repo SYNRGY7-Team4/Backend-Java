@@ -1,4 +1,4 @@
-package synrgy.team4.backend.security.jwt.config;
+package synrgy.team4.backend.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import synrgy.team4.backend.repository.UserRepository;
+import synrgy.team4.backend.security.jwt.CustomUserDetails;
 import synrgy.team4.backend.security.jwt.JwtAuthenticationFilter;
 
 @Configuration
@@ -34,6 +35,7 @@ public class WebSecurityConfig {
     @Bean
     UserDetailsService userDetailsService() {
         return username -> userRepository.findByEmail(username)
+                .map(CustomUserDetails::new)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
@@ -63,6 +65,7 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeRequests()
                 .requestMatchers("/login", "/register").permitAll()
+                .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
