@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,7 +13,11 @@ import java.util.Date;
 @Builder
 @Entity
 @Table(name = "tokens")
-public class Token extends BaseModel {
+public class Token {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(name = "jwt_token")
     private String jwtToken;
