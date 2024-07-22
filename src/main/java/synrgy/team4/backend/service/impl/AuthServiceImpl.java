@@ -18,6 +18,7 @@ import synrgy.team4.backend.model.entity.User;
 import synrgy.team4.backend.repository.UserRepository;
 import synrgy.team4.backend.security.jwt.service.JwtService;
 import synrgy.team4.backend.service.AuthService;
+import synrgy.team4.backend.service.TokenService;
 import synrgy.team4.backend.utils.ValidateDate;
 
 import java.util.Date;
@@ -29,18 +30,21 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final TokenService tokenService;
 
     @Autowired
     public AuthServiceImpl(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
-            JwtService jwtService
+            JwtService jwtService,
+            TokenService tokenService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.tokenService = tokenService;
     }
 
     /**
@@ -127,11 +131,16 @@ public class AuthServiceImpl implements AuthService {
         // Generate JWT token
         String jwtToken = jwtService.generateToken(user);
 
+        String refreshToken = tokenService.createRefreshToken();
+
+        tokenService.createToken(user.getEmail(), jwtToken, refreshToken);
+
         return LoginResponse.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
-                .token(jwtToken)
+                .jwtToken(jwtToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 }
