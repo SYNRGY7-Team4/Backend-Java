@@ -1,14 +1,17 @@
-package synrgy.team4.backend.model.dto;
+package synrgy.team4.backend.model.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.UUID;
 
 @Getter
 @Setter
-public class LoginResponseDTO {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class LoginResponse {
     @Schema(example = "97022c6c-56b5-4498-9d3d-f7fb7a1776b6")
     private UUID id;
 
@@ -19,12 +22,9 @@ public class LoginResponseDTO {
     private String email;
 
     @Schema(example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
-    private String token;
+    @JsonProperty("jwt_token")
+    private String jwtToken;
 
-    public LoginResponseDTO(UUID id, String name, String email, String token) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.token = token;
-    }
+    @JsonProperty("refresh_token")
+    private String refreshToken;
 }
