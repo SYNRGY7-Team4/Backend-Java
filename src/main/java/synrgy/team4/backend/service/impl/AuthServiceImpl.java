@@ -18,7 +18,7 @@ import synrgy.team4.backend.model.entity.User;
 import synrgy.team4.backend.repository.UserRepository;
 import synrgy.team4.backend.security.jwt.service.JwtService;
 import synrgy.team4.backend.service.AuthService;
-import synrgy.team4.backend.service.ValidationService;
+import synrgy.team4.backend.service.TokenService;
 import synrgy.team4.backend.utils.ValidateDate;
 
 import java.util.Date;
@@ -26,25 +26,25 @@ import java.util.Date;
 @Service
 public class AuthServiceImpl implements AuthService {
 
-    private final ValidationService validationService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final TokenService tokenService;
 
     @Autowired
     public AuthServiceImpl(
-            ValidationService validationService,
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
-            JwtService jwtService
+            JwtService jwtService,
+            TokenService tokenService
     ) {
-        this.validationService = validationService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.tokenService = tokenService;
     }
 
     /**
@@ -56,9 +56,6 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public UserResponse register(RegisterUserRequest request) {
-        // Validate the request
-        validationService.validate(request);
-
         // Check for existing email
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already registered");
@@ -111,12 +108,9 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public LoginResponse login(LoginRequest request) {
-        // Validate the request
-        validationService.validate(request);
-
         // Find user by email
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         // Check if the password matches the one stored in the database
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
@@ -137,11 +131,16 @@ public class AuthServiceImpl implements AuthService {
         // Generate JWT token
         String jwtToken = jwtService.generateToken(user);
 
+        String refreshToken = tokenService.createRefreshToken();
+
+        tokenService.createToken(user.getEmail(), jwtToken, refreshToken);
+
         return LoginResponse.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
-                .token(jwtToken)
+                .jwtToken(jwtToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 }

@@ -1,5 +1,6 @@
 package synrgy.team4.backend.model.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -21,5 +22,9 @@ public class LoginResponse {
     private String email;
 
     @Schema(example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
-    private String token;
+    @JsonProperty("jwt_token")
+    private String jwtToken;
+
+    @JsonProperty("refresh_token")
+    private String refreshToken;
 }
