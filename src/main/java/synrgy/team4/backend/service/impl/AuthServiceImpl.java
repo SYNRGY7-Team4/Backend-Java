@@ -26,13 +26,16 @@ import synrgy.team4.backend.utils.PinHashing;
 import synrgy.team4.backend.utils.ValidateDate;
 
 import java.math.BigDecimal;
+
 import java.util.Date;
 
 @Service
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+
     private final AccountRepository accountRepository;
+
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;

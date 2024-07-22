@@ -49,5 +49,4 @@ public class RegisterUserRequest {
     @Max(value = 6, message = "PIN must be 6 digits")
     @JsonProperty("pin")
     private String pin;
-
 }
