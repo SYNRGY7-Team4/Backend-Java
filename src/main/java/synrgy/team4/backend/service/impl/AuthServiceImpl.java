@@ -14,12 +14,18 @@ import synrgy.team4.backend.model.dto.request.LoginRequest;
 import synrgy.team4.backend.model.dto.request.RegisterUserRequest;
 import synrgy.team4.backend.model.dto.response.LoginResponse;
 import synrgy.team4.backend.model.dto.response.UserResponse;
+import synrgy.team4.backend.model.entity.Account;
 import synrgy.team4.backend.model.entity.User;
+import synrgy.team4.backend.repository.AccountRepository;
 import synrgy.team4.backend.repository.UserRepository;
 import synrgy.team4.backend.security.jwt.service.JwtService;
 import synrgy.team4.backend.service.AuthService;
 import synrgy.team4.backend.service.TokenService;
+import synrgy.team4.backend.utils.AccountNumberGenerator;
+import synrgy.team4.backend.utils.PinHashing;
 import synrgy.team4.backend.utils.ValidateDate;
+
+import java.math.BigDecimal;
 
 import java.util.Date;
 
@@ -27,6 +33,9 @@ import java.util.Date;
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+
+    private final AccountRepository accountRepository;
+
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
@@ -38,13 +47,15 @@ public class AuthServiceImpl implements AuthService {
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
             JwtService jwtService,
-            TokenService tokenService
+            TokenService tokenService,
+            AccountRepository accountRepository
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.tokenService = tokenService;
+        this.accountRepository = accountRepository;
     }
 
     /**
@@ -71,6 +82,10 @@ public class AuthServiceImpl implements AuthService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No KTP already registered");
         }
 
+        if (accountRepository.existsByAccountNumber(AccountNumberGenerator.generateAccountNumber())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Account Number already registered");
+        }
+
         Date dateOfBirth = ValidateDate.parseDate(request.getDateOfBirth());
 
         // Build and save the new User entity
@@ -79,13 +94,22 @@ public class AuthServiceImpl implements AuthService {
                 .email(request.getEmail())
                 .noKTP(request.getNoKTP())
                 .noHP(request.getNoHP())
-                .gender(Gender.valueOf(request.getGender().toUpperCase()))
+//                .gender(Gender.valueOf(request.getGender().toUpperCase()))
                 .dateOfBirth(dateOfBirth)
-                .placeOfBirth(request.getPlaceOfBirth())
+//                .placeOfBirth(request.getPlaceOfBirth())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
 
         userRepository.save(user);
+
+        Account account = Account.builder()
+                .accountNumber(AccountNumberGenerator.generateAccountNumber())
+                .balance(BigDecimal.valueOf(0.0))
+                .pin(PinHashing.hashPin(request.getPin()))
+                .user(user)
+                .build();
+
+        accountRepository.save(account);
 
         return UserResponse.builder()
                 .id(user.getId())
@@ -93,9 +117,9 @@ public class AuthServiceImpl implements AuthService {
                 .email(user.getEmail())
                 .noKTP(user.getNoKTP())
                 .noHP(user.getNoHP())
-                .gender(user.getGender())
+//                .gender(user.getGender())
                 .dateOfBirth(user.getDateOfBirth().toString())
-                .placeOfBirth(user.getPlaceOfBirth())
+//                .placeOfBirth(user.getPlaceOfBirth())
                 .build();
     }
 

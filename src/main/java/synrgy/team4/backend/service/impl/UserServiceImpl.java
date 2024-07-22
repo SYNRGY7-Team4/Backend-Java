@@ -39,9 +39,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .email(user.getEmail())
                 .noKTP(user.getNoKTP())
                 .noHP(user.getNoHP())
-                .gender(user.getGender())
+//                .gender(user.getGender())
                 .dateOfBirth(user.getDateOfBirth().toString())
-                .placeOfBirth(user.getPlaceOfBirth())
+//                .placeOfBirth(user.getPlaceOfBirth())
                 .build();
     }
 }

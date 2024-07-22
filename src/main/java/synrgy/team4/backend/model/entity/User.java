@@ -1,12 +1,11 @@
 package synrgy.team4.backend.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,7 +14,6 @@ import synrgy.team4.backend.model.dto.Gender;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -41,16 +39,16 @@ public class User extends BaseModel implements UserDetails {
     @Column(name = "no_hp", unique = true)
     private String noHP;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "gender")
-    private Gender gender;
+//    @Enumerated(EnumType.STRING)
+//    @Column(name = "gender")
+//    private Gender gender;
 
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
 
-    @Column(name = "place_of_birth")
-    private String placeOfBirth;
+//    @Column(name = "place_of_birth")
+//    private String placeOfBirth;
 
     @Schema(example = "passworduser1")
     private String password;

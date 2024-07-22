@@ -17,9 +17,9 @@ public class UserResponse {
     private String noKTP;
     @JsonProperty("no_hp")
     private String noHP;
-    private Gender gender;
+//    private Gender gender;
     @JsonProperty("date_of_birth")
     private String dateOfBirth;
-    @JsonProperty("place_of_birth")
-    private String placeOfBirth;
+//    @JsonProperty("place_of_birth")
+//    private String placeOfBirth;
 }
