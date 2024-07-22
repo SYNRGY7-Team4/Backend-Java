@@ -1,5 +1,6 @@
 package synrgy.team4.backend.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import synrgy.team4.backend.model.dto.*;
@@ -21,7 +22,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ApiResponse<UserResponse> register(@RequestBody RegisterUserRequest request) {
+    public ApiResponse<UserResponse> register(@Valid @RequestBody RegisterUserRequest request) {
         UserResponse userResponse = authService.register(request);
         return ApiResponse.<UserResponse>builder()
                 .success(true)
@@ -30,7 +31,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ApiResponse<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         LoginResponse loginResponse = authService.login(request);
         return ApiResponse.<LoginResponse>builder()
                 .success(true)

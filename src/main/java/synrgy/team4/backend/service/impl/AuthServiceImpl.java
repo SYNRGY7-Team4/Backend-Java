@@ -18,7 +18,6 @@ import synrgy.team4.backend.model.entity.User;
 import synrgy.team4.backend.repository.UserRepository;
 import synrgy.team4.backend.security.jwt.service.JwtService;
 import synrgy.team4.backend.service.AuthService;
-import synrgy.team4.backend.service.ValidationService;
 import synrgy.team4.backend.utils.ValidateDate;
 
 import java.util.Date;
@@ -26,7 +25,6 @@ import java.util.Date;
 @Service
 public class AuthServiceImpl implements AuthService {
 
-    private final ValidationService validationService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -34,13 +32,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     public AuthServiceImpl(
-            ValidationService validationService,
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
             JwtService jwtService
     ) {
-        this.validationService = validationService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
@@ -56,9 +52,6 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public UserResponse register(RegisterUserRequest request) {
-        // Validate the request
-        validationService.validate(request);
-
         // Check for existing email
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already registered");
@@ -111,12 +104,9 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public LoginResponse login(LoginRequest request) {
-        // Validate the request
-        validationService.validate(request);
-
         // Find user by email
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         // Check if the password matches the one stored in the database
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
