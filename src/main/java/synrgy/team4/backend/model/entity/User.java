@@ -58,6 +58,10 @@ public class User extends BaseModel implements UserDetails {
         return List.of();
     }
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Account> accounts;
+
     @Override
     public String getUsername() {
         return email;
