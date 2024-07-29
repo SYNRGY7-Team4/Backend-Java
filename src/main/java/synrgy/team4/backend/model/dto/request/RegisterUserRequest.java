@@ -1,13 +1,13 @@
 package synrgy.team4.backend.model.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Builder
@@ -26,6 +26,10 @@ public class RegisterUserRequest {
     @NotEmpty(message = "Password cannot be empty")
     private String password;
 
+    @NotEmpty(message = "Confirm Password cannot be empty")
+    @JsonProperty("confirm_password")
+    private String confirmPassword;
+
     @NotEmpty(message = "No KTP cannot be empty")
     @JsonProperty("no_ktp")
     private String noKTP;
@@ -37,16 +41,17 @@ public class RegisterUserRequest {
     @JsonProperty("date_of_birth")
     private String dateOfBirth;
 
-//    @NotEmpty(message = "Gender cannot be empty")
-//    private String gender;
-
-
-//    @NotEmpty(message = "Place of birth cannot be empty")
-//    @JsonProperty("place_of_birth")
-//    private String placeOfBirth;
+    @JsonIgnore
+    @JsonProperty("ektp_photo")
+    private MultipartFile ektpPhoto;
 
     @NotEmpty(message = "PIN cannot be empty")
     @Max(value = 6, message = "PIN must be 6 digits")
     @JsonProperty("pin")
     private String pin;
+
+    @NotEmpty(message = "Confirm PIN cannot be empty")
+    @Max(value = 6, message = "Confirm PIN must be 6 digits")
+    @JsonProperty("confirm_pin")
+    private String confirmPin;
 }

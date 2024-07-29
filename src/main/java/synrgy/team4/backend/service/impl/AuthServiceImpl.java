@@ -21,12 +21,11 @@ import synrgy.team4.backend.repository.UserRepository;
 import synrgy.team4.backend.security.jwt.service.JwtService;
 import synrgy.team4.backend.service.AuthService;
 import synrgy.team4.backend.service.TokenService;
-import synrgy.team4.backend.utils.AccountNumberGenerator;
-import synrgy.team4.backend.utils.PinHashing;
-import synrgy.team4.backend.utils.ValidateDate;
+import synrgy.team4.backend.utils.*;
 
 import java.math.BigDecimal;
 
+import java.util.Base64;
 import java.util.Date;
 
 @Service
@@ -40,6 +39,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final TokenService tokenService;
+    private final CloudinaryUtils cloudinaryUtils;
 
     @Autowired
     public AuthServiceImpl(
@@ -48,14 +48,15 @@ public class AuthServiceImpl implements AuthService {
             AuthenticationManager authenticationManager,
             JwtService jwtService,
             TokenService tokenService,
-            AccountRepository accountRepository
-    ) {
+            AccountRepository accountRepository,
+            CloudinaryUtils cloudinaryUtils) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.tokenService = tokenService;
         this.accountRepository = accountRepository;
+        this.cloudinaryUtils = cloudinaryUtils;
     }
 
     /**
@@ -88,15 +89,16 @@ public class AuthServiceImpl implements AuthService {
 
         Date dateOfBirth = ValidateDate.parseDate(request.getDateOfBirth());
 
+        String ektpPhotoImage = cloudinaryUtils.uploadImage(request.getEktpPhoto());
+
         // Build and save the new User entity
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .noKTP(request.getNoKTP())
                 .noHP(request.getNoHP())
-//                .gender(Gender.valueOf(request.getGender().toUpperCase()))
                 .dateOfBirth(dateOfBirth)
-//                .placeOfBirth(request.getPlaceOfBirth())
+                .ektpPhoto(ektpPhotoImage)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
 
@@ -112,14 +114,13 @@ public class AuthServiceImpl implements AuthService {
         accountRepository.save(account);
 
         return UserResponse.builder()
-                .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .noKTP(user.getNoKTP())
                 .noHP(user.getNoHP())
-//                .gender(user.getGender())
                 .dateOfBirth(user.getDateOfBirth().toString())
-//                .placeOfBirth(user.getPlaceOfBirth())
+                .ektpPhoto(user.getEktpPhoto())
+                .accountNumber(account.getAccountNumber())
                 .build();
     }
 
@@ -160,7 +161,6 @@ public class AuthServiceImpl implements AuthService {
         tokenService.createToken(user.getEmail(), jwtToken, refreshToken);
 
         return LoginResponse.builder()
-                .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .jwtToken(jwtToken)
