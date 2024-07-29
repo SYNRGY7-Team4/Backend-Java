@@ -73,7 +73,6 @@ public class TokenServiceImpl implements TokenService {
                     Token token = createToken(user.getEmail(), jwtToken, refreshToken);
 
                     return LoginResponse.builder()
-                            .id(user.getId())
                             .name(user.getName())
                             .email(user.getEmail())
                             .jwtToken(token.getJwtToken())

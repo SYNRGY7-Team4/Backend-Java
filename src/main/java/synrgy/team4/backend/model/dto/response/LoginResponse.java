@@ -12,9 +12,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LoginResponse {
-    @Schema(example = "97022c6c-56b5-4498-9d3d-f7fb7a1776b6")
-    private UUID id;
-
     @Schema(example = "User1")
     private String name;
 

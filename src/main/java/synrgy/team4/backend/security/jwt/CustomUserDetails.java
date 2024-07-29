@@ -1,11 +1,19 @@
 package synrgy.team4.backend.security.jwt;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
+import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import synrgy.team4.backend.model.entity.Account;
 import synrgy.team4.backend.model.entity.User;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -28,6 +36,26 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public String getUsername() {
         return user.getEmail();
+    }
+
+    public String getEmail() {
+        return user.getEmail();
+    }
+
+    public String getNoKTP() {
+        return user.getNoKTP();
+    }
+
+    public String getNoHP() {
+        return user.getNoHP();
+    }
+
+    public Date getDateOfBirth() {
+        return user.getDateOfBirth();
+    }
+
+    public UUID getId() {
+        return user.getId();
     }
 
     @Override
@@ -57,4 +85,10 @@ public class CustomUserDetails implements UserDetails {
     public User getUser() {
         return user;
     }
+
+    public List<Account> getAccounts() {
+        return user.getAccounts();
+    }
+
+    public String getEktpPhoto() { return user.getEktpPhoto(); }
 }

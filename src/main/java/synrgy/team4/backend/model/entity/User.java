@@ -1,5 +1,6 @@
 package synrgy.team4.backend.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -39,16 +40,13 @@ public class User extends BaseModel implements UserDetails {
     @Column(name = "no_hp", unique = true)
     private String noHP;
 
-//    @Enumerated(EnumType.STRING)
-//    @Column(name = "gender")
-//    private Gender gender;
-
     @DateTimeFormat(pattern = "dd-MM-yyyy")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
 
-//    @Column(name = "place_of_birth")
-//    private String placeOfBirth;
+    @Column(name = "ektp_photo")
+    private String ektpPhoto;
 
     @Schema(example = "passworduser1")
     private String password;
@@ -57,6 +55,10 @@ public class User extends BaseModel implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
     }
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Account> accounts;
 
     @Override
     public String getUsername() {
