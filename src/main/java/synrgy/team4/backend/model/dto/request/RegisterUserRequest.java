@@ -36,7 +36,6 @@ public class RegisterUserRequest {
     @JsonProperty("date_of_birth")
     private String dateOfBirth;
 
-    @JsonIgnore
     @JsonProperty("ektp_photo")
     private byte[] ektpPhoto;
 
