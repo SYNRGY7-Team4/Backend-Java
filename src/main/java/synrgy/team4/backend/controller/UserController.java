@@ -28,6 +28,7 @@ public class UserController {
         return BaseResponse.<UserResponse>builder()
                 .success(true)
                 .data(userResponse)
+                .message("User data retrieved successfully.")
                 .build();
     }
 

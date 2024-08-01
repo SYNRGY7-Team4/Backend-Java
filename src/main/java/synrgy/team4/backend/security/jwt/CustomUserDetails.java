@@ -1,10 +1,5 @@
 package synrgy.team4.backend.security.jwt;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
-import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import synrgy.team4.backend.model.entity.Account;
@@ -90,5 +85,5 @@ public class CustomUserDetails implements UserDetails {
         return user.getAccounts();
     }
 
-    public String getEktpPhoto() { return user.getEktpPhoto(); }
+    public byte[] getEktpPhoto() { return user.getEktpPhoto(); }
 }

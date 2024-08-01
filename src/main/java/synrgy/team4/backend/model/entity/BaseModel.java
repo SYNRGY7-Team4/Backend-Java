@@ -16,7 +16,6 @@ import java.util.UUID;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public class BaseModel implements Serializable {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

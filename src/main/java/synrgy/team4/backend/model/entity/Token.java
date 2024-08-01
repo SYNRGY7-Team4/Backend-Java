@@ -14,7 +14,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "tokens")
 public class Token {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

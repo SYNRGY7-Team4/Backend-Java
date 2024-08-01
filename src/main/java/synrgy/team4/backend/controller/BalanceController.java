@@ -44,7 +44,5 @@ public class BalanceController {
                 .build();
 
         return ResponseEntity.ok(response);
-
-
     }
 }
