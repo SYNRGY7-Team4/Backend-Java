@@ -37,7 +37,7 @@ public class RegisterUserRequest {
     private String dateOfBirth;
 
     @JsonProperty("ektp_photo")
-    private byte[] ektpPhoto;
+    private String ektpPhoto;
 
     @NotEmpty(message = "PIN cannot be empty")
     @Max(value = 6, message = "PIN must be 6 digits")
