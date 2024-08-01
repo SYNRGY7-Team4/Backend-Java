@@ -23,9 +23,6 @@ import synrgy.team4.backend.service.TokenService;
 import synrgy.team4.backend.utils.*;
 
 import java.math.BigDecimal;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Date;
 
 @Service
@@ -114,7 +111,7 @@ public class AuthServiceImpl implements AuthService {
                 .noKTP(user.getNoKTP())
                 .noHP(user.getNoHP())
                 .dateOfBirth(user.getDateOfBirth().toString())
-                .ektpPhoto(Arrays.toString(user.getEktpPhoto()))
+                .ektpPhoto(user.getEktpPhoto())
                 .accountNumber(account.getAccountNumber())
                 .build();
     }

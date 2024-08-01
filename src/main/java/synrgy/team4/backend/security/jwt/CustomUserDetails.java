@@ -85,5 +85,5 @@ public class CustomUserDetails implements UserDetails {
         return user.getAccounts();
     }
 
-    public byte[] getEktpPhoto() { return user.getEktpPhoto(); }
+    public String getEktpPhoto() { return user.getEktpPhoto(); }
 }

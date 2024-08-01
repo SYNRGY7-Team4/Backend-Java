@@ -51,7 +51,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .noKTP(userDetails.getNoKTP())
                 .noHP(userDetails.getNoHP())
                 .dateOfBirth(userDetails.getDateOfBirth().toString())
-                .ektpPhoto(Arrays.toString(userDetails.getEktpPhoto()))
                 .accountNumber(account.getAccountNumber())
                 .build();
     }
