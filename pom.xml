@@ -39,6 +39,10 @@
 			<artifactId>spring-security-web</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>42.7.3</version>
@@ -105,6 +109,17 @@
 			<version>1.8.0</version>
 		</dependency>
 
+		<!--QR Code	-->
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>core</artifactId>
+			<version>3.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>javase</artifactId>
+			<version>3.4.0</version>
+		</dependency>
 		<!--JWT	-->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
