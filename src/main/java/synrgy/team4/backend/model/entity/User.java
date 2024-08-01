@@ -10,7 +10,6 @@ import org.hibernate.annotations.SQLRestriction;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.GrantedAuthority;
-import synrgy.team4.backend.model.dto.Gender;
 
 import java.util.Collection;
 import java.util.Date;
@@ -26,7 +25,6 @@ import java.util.List;
 @SQLDelete(sql = "UPDATE users SET deleted = true WHERE id = ?")
 @SQLRestriction("deleted = false")
 public class User extends BaseModel implements UserDetails {
-
     @Schema(example = "User1")
     private String name;
 
@@ -45,8 +43,9 @@ public class User extends BaseModel implements UserDetails {
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
 
+    @Lob
     @Column(name = "ektp_photo")
-    private String ektpPhoto;
+    private byte[] ektpPhoto;
 
     @Schema(example = "passworduser1")
     private String password;

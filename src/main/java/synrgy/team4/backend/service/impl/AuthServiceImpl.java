@@ -9,7 +9,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import synrgy.team4.backend.model.dto.Gender;
 import synrgy.team4.backend.model.dto.request.LoginRequest;
 import synrgy.team4.backend.model.dto.request.RegisterUserRequest;
 import synrgy.team4.backend.model.dto.response.LoginResponse;
@@ -25,7 +24,8 @@ import synrgy.team4.backend.utils.*;
 
 import java.math.BigDecimal;
 
-import java.util.Base64;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Date;
 
 @Service
@@ -39,7 +39,6 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final TokenService tokenService;
-    private final CloudinaryUtils cloudinaryUtils;
 
     @Autowired
     public AuthServiceImpl(
@@ -48,15 +47,13 @@ public class AuthServiceImpl implements AuthService {
             AuthenticationManager authenticationManager,
             JwtService jwtService,
             TokenService tokenService,
-            AccountRepository accountRepository,
-            CloudinaryUtils cloudinaryUtils) {
+            AccountRepository accountRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.tokenService = tokenService;
         this.accountRepository = accountRepository;
-        this.cloudinaryUtils = cloudinaryUtils;
     }
 
     /**
@@ -89,8 +86,6 @@ public class AuthServiceImpl implements AuthService {
 
         Date dateOfBirth = ValidateDate.parseDate(request.getDateOfBirth());
 
-        String ektpPhotoImage = cloudinaryUtils.uploadImage(request.getEktpPhoto());
-
         // Build and save the new User entity
         User user = User.builder()
                 .name(request.getName())
@@ -98,7 +93,7 @@ public class AuthServiceImpl implements AuthService {
                 .noKTP(request.getNoKTP())
                 .noHP(request.getNoHP())
                 .dateOfBirth(dateOfBirth)
-                .ektpPhoto(ektpPhotoImage)
+                .ektpPhoto(request.getEktpPhoto())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
 
@@ -119,7 +114,7 @@ public class AuthServiceImpl implements AuthService {
                 .noKTP(user.getNoKTP())
                 .noHP(user.getNoHP())
                 .dateOfBirth(user.getDateOfBirth().toString())
-                .ektpPhoto(user.getEktpPhoto())
+                .ektpPhoto(Arrays.toString(user.getEktpPhoto()))
                 .accountNumber(account.getAccountNumber())
                 .build();
     }

@@ -15,6 +15,7 @@ import synrgy.team4.backend.repository.UserRepository;
 import synrgy.team4.backend.security.jwt.CustomUserDetails;
 import synrgy.team4.backend.service.UserService;
 
+import java.util.Arrays;
 import java.util.Base64;
 
 @Service
@@ -50,10 +51,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .noKTP(userDetails.getNoKTP())
                 .noHP(userDetails.getNoHP())
                 .dateOfBirth(userDetails.getDateOfBirth().toString())
-                .ektpPhoto(userDetails.getEktpPhoto())
+                .ektpPhoto(Arrays.toString(userDetails.getEktpPhoto()))
                 .accountNumber(account.getAccountNumber())
                 .build();
     }
-
-
 }
