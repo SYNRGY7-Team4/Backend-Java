@@ -1,5 +1,6 @@
 package synrgy.team4.backend.service.impl;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 import java.util.Base64;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserRepository userRepository;
@@ -52,6 +54,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .noHP(userDetails.getNoHP())
                 .dateOfBirth(userDetails.getDateOfBirth().toString())
                 .accountNumber(account.getAccountNumber())
+                .accountPin(account.getPin())
                 .build();
     }
 }
