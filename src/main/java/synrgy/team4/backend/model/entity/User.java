@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.Where;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,7 +23,7 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 @SQLDelete(sql = "UPDATE users SET deleted = true WHERE id = ?")
-@SQLRestriction("deleted = false")
+@Where(clause = "deleted = false")
 public class User extends BaseModel implements UserDetails {
     @Schema(example = "User1")
     private String name;
@@ -59,8 +59,21 @@ public class User extends BaseModel implements UserDetails {
     @JsonManagedReference
     private List<Account> accounts;
 
+    @Column(length = 100, nullable = true)
+    private String otp;
+    private Date otpExpiredDate;
+
     @Override
     public String getUsername() {
         return email;
+    }
+    public String getOtp() {
+        return otp;
+    }
+    public void setOtp(String otp) {
+        this.otp = otp;
+    }
+    public Date getOtpExpiredDate() {
+        return otpExpiredDate;
     }
 }
