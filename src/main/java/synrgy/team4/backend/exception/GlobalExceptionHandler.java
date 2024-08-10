@@ -3,6 +3,7 @@ package synrgy.team4.backend.exception;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
@@ -31,4 +32,15 @@ public class GlobalExceptionHandler {
                         .errors(exception.getReason())
                         .build());
     }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<BaseResponse<String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        String errorMessage = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        log.error("Validation error: {}", errorMessage);
+        return ResponseEntity.badRequest()
+                .body(BaseResponse.<String>builder()
+                        .success(false)
+                        .errors(errorMessage)
+                        .build());
+    }
+
 }
