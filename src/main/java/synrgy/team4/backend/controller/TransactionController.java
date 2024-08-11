@@ -13,6 +13,7 @@ import synrgy.team4.backend.model.entity.Transaction;
 import synrgy.team4.backend.security.jwt.CustomUserDetails;
 import synrgy.team4.backend.service.TransactionService;
 import synrgy.team4.backend.service.impl.TransactionServiceImpl;
+import synrgy.team4.backend.utils.PinHashing;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class TransactionController {
     private final TransactionServiceImpl transactionService;
 
     @Autowired
-    public TransactionController(TransactionServiceImpl transactionService) {
+    public TransactionController(TransactionServiceImpl transactionService, PinHashing pinHashing) {
         this.transactionService = transactionService;
     }
 
@@ -37,6 +38,10 @@ public class TransactionController {
                 .filter(acc -> acc.getAccountNumber().equals(request.getAccountFrom()))
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to access this account."));
+
+        if (!PinHashing.verifyPin(request.getPin(), account.getPin())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Incorrect pin.");
+        }
 
         Transaction transaction = transactionService.makeTransaction(request.getAccountFrom(), request.getAccountTo(), request.getAmount(), request.getDescription());
 
