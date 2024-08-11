@@ -4,6 +4,7 @@ import synrgy.team4.backend.model.dto.response.BaseResponse;
 import synrgy.team4.backend.model.dto.response.MutationResponse;
 import synrgy.team4.backend.model.entity.Transaction;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,4 +15,6 @@ public interface TransactionService {
     Optional<Transaction> getMutationById(UUID id);
 
     Optional<Transaction> getTransactionById(UUID id);
+
+    Transaction makeTransaction(String accountFromNumber, String accountToNumber, BigDecimal amount, String description);
 }
