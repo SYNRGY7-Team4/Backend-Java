@@ -23,11 +23,15 @@ import java.util.List;
 @RequestMapping("/balance")
 public class BalanceController {
 
+    private final BalanceService balanceService;
+
     @Autowired
-    private BalanceService balanceService;
+    public BalanceController(BalanceService balanceService) {
+        this.balanceService = balanceService;
+    }
 
     @GetMapping("/get")
-    public ResponseEntity<?> getBalance(@RequestParam String accountNumber, Authentication authentication) {
+    public ResponseEntity<BaseResponse<BigDecimal>> getBalance(@RequestParam String accountNumber, Authentication authentication) {
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         List<Account> accounts = userDetails.getAccounts();
