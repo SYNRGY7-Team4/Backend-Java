@@ -2,11 +2,11 @@ package synrgy.team4.backend.model.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Max;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Builder
@@ -40,7 +40,7 @@ public class RegisterUserRequest {
     private String ektpPhoto;
 
     @NotEmpty(message = "PIN cannot be empty")
-    @Max(value = 6, message = "PIN must be 6 digits")
+    @Size(min = 6, max = 6, message = "PIN must be 6 digits")
     @JsonProperty("pin")
     private String pin;
 }
