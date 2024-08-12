@@ -27,6 +27,9 @@ public class UserResponse {
     @JsonProperty("account_number")
     private String accountNumber;
 
+    @JsonProperty("account_pin")
+    private String accountPin;
+
     @JsonProperty("ektp_photo")
     private String ektpPhoto;
 }

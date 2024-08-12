@@ -26,4 +26,12 @@ public class BalanceServiceImpl implements BalanceService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
         return account.getBalance();
     }
+
+    @Override
+    public void setBalance(String accountNumber, BigDecimal newBalance) {
+        Account account = accountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
+        account.setBalance(newBalance);
+        accountRepository.save(account);
+    }
 }

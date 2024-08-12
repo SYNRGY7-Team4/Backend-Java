@@ -13,8 +13,8 @@ import java.util.List;
 
 @Configuration
 public class SwaggerConfig {
-//    @Value("${openapi.dev-url}")
-//    private String devUrl;
+    @Value("${openapi.dev-url}")
+    private String devUrl;
 
     @Value("${openapi.prod-url}")
     private String prodUrl;
@@ -28,6 +28,9 @@ public class SwaggerConfig {
         Server prodServer = new Server();
         prodServer.setUrl(prodUrl);
         prodServer.setDescription("Server URL in Production environment");
+
+        Server devServer = new Server();
+        devServer.setUrl(devUrl);
 
         Contact contact = new Contact();
         contact.setEmail("synrgyteam4@gmail.com");
@@ -44,6 +47,8 @@ public class SwaggerConfig {
                 .description("This API exposes endpoints to Lumi by Team 4 for the Final Project from Synrgy Academy.")
                 .license(mitLicense);
 
-        return new OpenAPI().info(info).servers(List.of(prodServer));
+//        return new OpenAPI().info(info).servers(List.of(prodServer));
+        return new OpenAPI().info(info).servers(List.of(devServer, prodServer));
+
     }
 }
