@@ -13,7 +13,7 @@ import java.util.UUID;
 public interface TransactionService {
     BaseResponse<List<MutationResponse>> getMutations(String accountNumber);
 
-    BaseResponse<List<MutationResponse>> getMutationsByDate(String accountNumber, LocalDateTime startDate, LocalDateTime endDate);
+    BaseResponse<List<MutationResponse>> getMutationsByDate(String accountNumber, LocalDateTime startDate, LocalDateTime endDate, String type);
 
     Optional<Transaction> getMutationById(UUID id);
 

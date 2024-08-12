@@ -58,11 +58,11 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public BaseResponse<List<MutationResponse>> getMutationsByDate(String accountNumber, LocalDateTime startDate, LocalDateTime endDate) {
+    public BaseResponse<List<MutationResponse>> getMutationsByDate(String accountNumber, LocalDateTime startDate, LocalDateTime endDate, String type) {
         Account account = accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
 
-        List<Transaction> transactions = transactionRepository.findByDatetimeBetween(startDate, endDate);
+        List<Transaction> transactions = transactionRepository.findByDatetimeBetweenAndType(startDate, endDate, type);
 
         List<MutationResponse> mutationResponses = transactions.stream()
                 .map(transaction -> new MutationResponse(

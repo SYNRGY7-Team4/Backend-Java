@@ -52,6 +52,7 @@ public class TransactionController {
             @RequestParam String accountNumber,
             @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate startDate,
             @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate endDate,
+            @RequestParam String type,
             Authentication authentication
     ) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -64,7 +65,7 @@ public class TransactionController {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
 
-        BaseResponse<List<MutationResponse>> response = transactionService.getMutationsByDate(accountNumber, startDateTime, endDateTime);
+        BaseResponse<List<MutationResponse>> response = transactionService.getMutationsByDate(accountNumber, startDateTime, endDateTime, type);
         return ResponseEntity.ok(response).getBody();
     }
 
