@@ -1,5 +1,6 @@
 package synrgy.team4.backend.service.impl;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,12 +24,10 @@ import synrgy.team4.backend.service.TokenService;
 import synrgy.team4.backend.utils.*;
 
 import java.math.BigDecimal;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Date;
 
 @Service
+@Transactional
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
@@ -80,6 +79,7 @@ public class AuthServiceImpl implements AuthService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No KTP already registered");
         }
 
+        // Check for existing Account number
         if (accountRepository.existsByAccountNumber(AccountNumberGenerator.generateAccountNumber())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Account Number already registered");
         }
@@ -114,7 +114,7 @@ public class AuthServiceImpl implements AuthService {
                 .noKTP(user.getNoKTP())
                 .noHP(user.getNoHP())
                 .dateOfBirth(user.getDateOfBirth().toString())
-                .ektpPhoto(Arrays.toString(user.getEktpPhoto()))
+                .ektpPhoto(user.getEktpPhoto())
                 .accountNumber(account.getAccountNumber())
                 .build();
     }

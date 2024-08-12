@@ -14,5 +14,5 @@ public class BaseResponse<T> {
     private boolean success;
     private T data;
     private String message;
-    private String errors;
+    private T errors;
 }

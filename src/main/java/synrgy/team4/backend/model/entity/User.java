@@ -45,7 +45,7 @@ public class User extends BaseModel implements UserDetails {
 
     @Lob
     @Column(name = "ektp_photo")
-    private byte[] ektpPhoto;
+    private String ektpPhoto;
 
     @Schema(example = "passworduser1")
     private String password;

@@ -3,7 +3,11 @@ package synrgy.team4.backend.model.dto.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Builder
 @Data
 public class UserResponse {
@@ -22,6 +26,9 @@ public class UserResponse {
 
     @JsonProperty("account_number")
     private String accountNumber;
+
+    @JsonProperty("account_pin")
+    private String accountPin;
 
     @JsonProperty("ektp_photo")
     private String ektpPhoto;
