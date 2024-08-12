@@ -2,6 +2,7 @@ package synrgy.team4.backend.model.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import synrgy.team4.backend.model.entity.User;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,4 +28,5 @@ public class MutationResponse {
     private String type; // e.g., "deposit", "withdrawal", "transfer"
     private String status;
     private String description;
+    private BigDecimal balance;
 }

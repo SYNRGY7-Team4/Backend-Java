@@ -7,8 +7,10 @@ import synrgy.team4.backend.model.dto.response.BaseResponse;
 import synrgy.team4.backend.model.dto.response.MutationResponse;
 import synrgy.team4.backend.model.entity.Account;
 import synrgy.team4.backend.model.entity.Transaction;
+import synrgy.team4.backend.model.entity.User;
 import synrgy.team4.backend.repository.AccountRepository;
 import synrgy.team4.backend.repository.TransactionRepository;
+import synrgy.team4.backend.repository.UserRepository;
 import synrgy.team4.backend.service.TransactionService;
 
 import java.math.BigDecimal;
@@ -22,10 +24,12 @@ import java.util.stream.Collectors;
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
+    private final UserRepository userRepository;
 
-    public TransactionServiceImpl(TransactionRepository transactionRepository, AccountRepository accountRepository) {
+    public TransactionServiceImpl(TransactionRepository transactionRepository, AccountRepository accountRepository, UserRepository userRepository) {
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -44,7 +48,8 @@ public class TransactionServiceImpl implements TransactionService {
                         transaction.getDatetime(),
                         transaction.getType(),
                         transaction.getStatus(),
-                        transaction.getDescription()
+                        transaction.getDescription(),
+                        account.getBalance()
                 ))
                 .collect(Collectors.toList());
 
