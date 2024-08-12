@@ -19,9 +19,13 @@ public class MutationResponse {
 
     @JsonProperty("account_from")
     private String accountFrom;
+    @JsonProperty("username_from")
+    private String nameAccountFrom;
 
     @JsonProperty("account_to")
     private String accountTo;
+    @JsonProperty("username_to")
+    private String nameAccountTo;
 
     private BigDecimal amount;
     private LocalDateTime datetime;
