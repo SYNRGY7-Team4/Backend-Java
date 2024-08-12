@@ -2,6 +2,7 @@ package synrgy.team4.backend.model.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Email;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,7 @@ import lombok.Setter;
 @Setter
 public class LoginRequest {
     @NotEmpty(message = "Email cannot be empty")
+    @Email(message = "Email format is incorrect")
     @Schema(example = "user1@gmail.com")
     private String email;
 
