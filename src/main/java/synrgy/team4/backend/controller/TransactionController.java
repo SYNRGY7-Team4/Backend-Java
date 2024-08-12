@@ -86,7 +86,9 @@ public class TransactionController {
         MutationResponse mutationResponse = new MutationResponse(
                 transaction.getId(),
                 transaction.getAccountFrom().getAccountNumber(),
+                transaction.getAccountFrom().getUser().getName(),
                 transaction.getAccountTo().getAccountNumber(),
+                transaction.getAccountTo().getUser().getName(),
                 transaction.getAmount(),
                 transaction.getDatetime(),
                 transaction.getType(),

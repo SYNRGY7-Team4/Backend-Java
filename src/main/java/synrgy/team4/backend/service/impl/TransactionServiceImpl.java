@@ -40,7 +40,9 @@ public class TransactionServiceImpl implements TransactionService {
                 .map(transaction -> new MutationResponse(
                         transaction.getId(),
                         transaction.getAccountFrom().getAccountNumber(),
+                        transaction.getAccountFrom().getUser().getName(),
                         transaction.getAccountTo().getAccountNumber(),
+                        transaction.getAccountTo().getUser().getName(),
                         transaction.getAmount(),
                         transaction.getDatetime(),
                         transaction.getType(),
@@ -68,7 +70,9 @@ public class TransactionServiceImpl implements TransactionService {
                 .map(transaction -> new MutationResponse(
                         transaction.getId(),
                         transaction.getAccountFrom().getAccountNumber(),
+                        transaction.getAccountFrom().getUser().getName(),
                         transaction.getAccountTo().getAccountNumber(),
+                        transaction.getAccountTo().getUser().getName(),
                         transaction.getAmount(),
                         transaction.getDatetime(),
                         transaction.getType(),
