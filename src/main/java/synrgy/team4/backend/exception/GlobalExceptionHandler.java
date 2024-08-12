@@ -38,16 +38,16 @@ public class GlobalExceptionHandler {
                         .build());
     }
   
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<BaseResponse<String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        String errorMessage = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
-        log.error("Validation error: {}", errorMessage);
-        return ResponseEntity.badRequest()
-                .body(BaseResponse.<String>builder()
-                        .success(false)
-                        .errors(errorMessage)
-                        .build());
-    }
+    // @ExceptionHandler(MethodArgumentNotValidException.class)
+    // public ResponseEntity<BaseResponse<String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    //     String errorMessage = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+    //     log.error("Validation error: {}", errorMessage);
+    //     return ResponseEntity.badRequest()
+    //             .body(BaseResponse.<String>builder()
+    //                     .success(false)
+    //                     .errors(errorMessage)
+    //                     .build());
+    // }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
