@@ -68,22 +68,20 @@ public class AuthServiceImpl implements AuthService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already registered");
         }
-
         // Check for existing phone number
         if (userRepository.existsByNoHP(request.getNoHP())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No HP already registered");
         }
-
-        // Check for existing KTP number
+        // Check for existing KTP Number
         if (userRepository.existsByNoKTP(request.getNoKTP())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No KTP already registered");
         }
-
         // Check for existing Account number
         if (accountRepository.existsByAccountNumber(AccountNumberGenerator.generateAccountNumber())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Account Number already registered");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nomor Akun already registered");
         }
 
+        // Parsing DOB
         Date dateOfBirth = ValidateDate.parseDate(request.getDateOfBirth());
 
         // Build and save the new User entity
@@ -99,6 +97,7 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
 
+        // Build and save the new User entity
         Account account = Account.builder()
                 .accountNumber(AccountNumberGenerator.generateAccountNumber())
                 .balance(BigDecimal.valueOf(0.0))
@@ -118,6 +117,7 @@ public class AuthServiceImpl implements AuthService {
                 .accountNumber(account.getAccountNumber())
                 .build();
     }
+
 
     /**
      * Authenticates a user and generates a JWT token.

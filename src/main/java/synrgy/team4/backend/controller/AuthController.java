@@ -28,29 +28,24 @@ public class AuthController {
         this.authService = authService;
         this.tokenService = tokenService;
     }
-
     @PostMapping("/register")
     public ResponseEntity<BaseResponse<UserResponse>> register(
             @Valid @RequestBody RegisterUserRequest request
     ) {
         try {
             UserResponse userResponse = authService.register(request);
-
             BaseResponse<UserResponse> response = BaseResponse.<UserResponse>builder()
                     .success(true)
                     .data(userResponse)
                     .message("User registered successfully.")
                     .build();
-
             return new ResponseEntity<>(response, HttpStatus.CREATED);
-
         } catch (Exception e) {
             BaseResponse<UserResponse> errorResponse = BaseResponse.<UserResponse>builder()
                     .success(false)
                     .data(null)
                     .message("Registration failed: " + e.getMessage())
                     .build();
-
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

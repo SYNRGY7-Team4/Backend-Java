@@ -122,15 +122,23 @@ public class TransactionController {
 
         Transaction transaction = transactionService.makeTransaction(request.getAccountFrom(), request.getAccountTo(), request.getAmount(), request.getDescription());
 
+        // Get the user names for both accounts involved in the transaction
+        String userAccountFrom = transaction.getAccountFrom().getUser().getName();
+        String userAccountTo = transaction.getAccountTo().getUser().getName();
+
+        // Construct the response
         TransactionResponse transactionResponse = new TransactionResponse();
         transactionResponse.setId(transaction.getId());
         transactionResponse.setAccountFrom(transaction.getAccountFrom().getAccountNumber());
+        transactionResponse.setNameAccountFrom(userAccountFrom);
         transactionResponse.setAccountTo(transaction.getAccountTo().getAccountNumber());
+        transactionResponse.setNameAccountTo(userAccountTo);
         transactionResponse.setAmount(transaction.getAmount());
         transactionResponse.setDatetime(transaction.getDatetime());
         transactionResponse.setType(transaction.getType());
         transactionResponse.setStatus(transaction.getStatus());
         transactionResponse.setDescription(transaction.getDescription());
+        transactionResponse.setBalance(account.getBalance()); // Set balance
 
         return BaseResponse.<TransactionResponse>builder()
                 .success(true)
@@ -138,4 +146,5 @@ public class TransactionController {
                 .message("Transfer successful.")
                 .build();
     }
+
 }
