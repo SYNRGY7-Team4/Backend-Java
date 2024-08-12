@@ -1,15 +1,10 @@
 package synrgy.team4.backend.model.dto.request;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Max;
-import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
@@ -17,33 +12,35 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor
 public class RegisterUserRequest {
 
-    @Email(message = "Format email salah")
-    @NotEmpty(message = "Email tidak boleh kosong")
+    @Email(message = "Email format is incorrect")
+    @NotEmpty(message = "Email cannot be empty")
     private String email;
 
-    @NotEmpty(message = "No Handphone tidak boleh kosong")
+    @NotEmpty(message = "Phone number cannot be empty")
+    @Pattern(regexp = "\\d{12}", message = "Phone number must be exactly 12 digits")
     @JsonProperty("no_hp")
     private String noHP;
 
-    @NotEmpty(message = "Password tidak boleh kosong")
+    @NotEmpty(message = "Password cannot be empty")
     private String password;
 
-    @NotEmpty(message = "No KTP tidak boleh kosong")
+    @NotEmpty(message = "KTP number cannot be empty")
+    @Pattern(regexp = "\\d{16}", message = "KTP number must be exactly 16 digits")
     @JsonProperty("no_ktp")
     private String noKTP;
 
-    @NotEmpty(message = "Nama tidak boleh kosong")
+    @NotEmpty(message = "Name cannot be empty")
     private String name;
 
-    @NotEmpty(message = "Tanggal lahir tidak boleh kosong")
+    @NotEmpty(message = "Date of birth cannot be empty")
     @JsonProperty("date_of_birth")
     private String dateOfBirth;
 
     @JsonProperty("ektp_photo")
     private String ektpPhoto;
 
-    @NotEmpty(message = "PIN tidak boleh kosong")
-    @Max(value = 6, message = "PIN harus 6 digit")
+    @NotEmpty(message = "PIN cannot be empty")
+    @Pattern(regexp = "\\d{6}", message = "PIN must be exactly 6 digits")
     @JsonProperty("pin")
     private String pin;
 }

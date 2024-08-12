@@ -64,50 +64,27 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public UserResponse register(RegisterUserRequest request) {
-        if (request.getName() == null || request.getName().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nama tidak boleh kosong");
-        }
-        // Validasi email kosong
-        if (request.getEmail() == null || request.getEmail().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email tidak boleh kosong");
-        }
-
-        // Validasi format email
-        if (!request.getEmail().contains("@")) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Format email tidak valid");
-        }
-
-        // Cek apakah email sudah terdaftar
+        // Check for existing email
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email sudah terdaftar");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already registered");
         }
-
-        // Cek apakah nomor HP sudah terdaftar
+        // Check for existing phone number
         if (userRepository.existsByNoHP(request.getNoHP())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No HP sudah terdaftar");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No HP already registered");
         }
-
-        if (request.getNoHP().length() != 12) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Handphone tidak valid");
-        }
-
-        // Cek apakah nomor KTP sudah terdaftar
+        // Check for existing KTP Number
         if (userRepository.existsByNoKTP(request.getNoKTP())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No KTP sudah terdaftar");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No KTP already registered");
         }
-        if (request.getNoKTP().length() != 16) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No KTP tidak valid");
-        }
-
-        // Cek apakah nomor akun sudah terdaftar
+        // Check for existing Account number
         if (accountRepository.existsByAccountNumber(AccountNumberGenerator.generateAccountNumber())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nomor Akun sudah terdaftar");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nomor Akun already registered");
         }
 
-        // Parsing tanggal lahir
+        // Parsing DOB
         Date dateOfBirth = ValidateDate.parseDate(request.getDateOfBirth());
 
-        // Membangun dan menyimpan entitas User baru
+        // Build and save the new User entity
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
@@ -120,7 +97,7 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
 
-        // Membangun dan menyimpan entitas Account baru
+        // Build and save the new User entity
         Account account = Account.builder()
                 .accountNumber(AccountNumberGenerator.generateAccountNumber())
                 .balance(BigDecimal.valueOf(0.0))

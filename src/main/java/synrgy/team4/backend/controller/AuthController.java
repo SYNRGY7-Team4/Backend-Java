@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import synrgy.team4.backend.model.dto.request.LoginRequest;
 import synrgy.team4.backend.model.dto.request.RefreshTokenRequest;
 import synrgy.team4.backend.model.dto.request.RegisterUserRequest;
@@ -35,25 +34,22 @@ public class AuthController {
     ) {
         try {
             UserResponse userResponse = authService.register(request);
-
             BaseResponse<UserResponse> response = BaseResponse.<UserResponse>builder()
                     .success(true)
                     .data(userResponse)
                     .message("User registered successfully.")
                     .build();
-
             return new ResponseEntity<>(response, HttpStatus.CREATED);
-
-        } catch (ResponseStatusException e) {
+        } catch (Exception e) {
             BaseResponse<UserResponse> errorResponse = BaseResponse.<UserResponse>builder()
                     .success(false)
                     .data(null)
-                    .message("Registration failed: " + e.getReason())
+                    .message("Registration failed: " + e.getMessage())
                     .build();
-
-            return new ResponseEntity<>(errorResponse, e.getStatusCode());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @PostMapping("/login")
     public ResponseEntity<BaseResponse<LoginResponse>> login(
             @Valid @RequestBody LoginRequest request

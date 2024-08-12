@@ -42,5 +42,4 @@ public class GlobalExceptionHandler {
                         .errors(errorMessage)
                         .build());
     }
-
 }
