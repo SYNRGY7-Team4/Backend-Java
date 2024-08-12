@@ -47,6 +47,7 @@ public class GlobalExceptionHandler {
                         .success(false)
                         .errors(errorMessage)
                         .build());
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
