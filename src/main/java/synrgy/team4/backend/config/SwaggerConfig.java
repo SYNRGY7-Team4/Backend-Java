@@ -21,21 +21,17 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI myOpenAPI() {
-//        Server devServer = new Server();
-//        devServer.setUrl(devUrl);
-//        devServer.setDescription("Server URL in Development environment");
-
         Server prodServer = new Server();
         prodServer.setUrl(prodUrl);
         prodServer.setDescription("Server URL in Production environment");
 
         Server devServer = new Server();
         devServer.setUrl(devUrl);
+        devServer.setDescription("Server URL in Development environment");
 
         Contact contact = new Contact();
         contact.setEmail("synrgyteam4@gmail.com");
         contact.setName("Team 4");
-//        contact.setUrl("https://firmanpu.tech");
 
         License mitLicense = new License().name("MIT License")
                 .url("https://choosealicense.com/licenses/mit/");
