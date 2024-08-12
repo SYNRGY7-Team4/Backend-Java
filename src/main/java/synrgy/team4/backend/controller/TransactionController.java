@@ -1,7 +1,9 @@
 package synrgy.team4.backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,6 +20,8 @@ import synrgy.team4.backend.service.impl.TransactionServiceImpl;
 import synrgy.team4.backend.service.impl.UserServiceImpl;
 import synrgy.team4.backend.utils.PinHashing;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,6 +45,27 @@ public class TransactionController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to access this account."));
 
         return transactionService.getMutations(accountNumber);
+    }
+
+    @GetMapping("/mutation/date")
+    public BaseResponse<List<MutationResponse>> getMutationDates(
+            @RequestParam String accountNumber,
+            @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate startDate,
+            @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate endDate,
+            Authentication authentication
+    ) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        List<Account> accounts = userDetails.getAccounts();
+        Account account = accounts.stream()
+                .filter(acc -> acc.getAccountNumber().equals(accountNumber))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to access this account."));
+
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+
+        BaseResponse<List<MutationResponse>> response = transactionService.getMutationsByDate(accountNumber, startDateTime, endDateTime);
+        return ResponseEntity.ok(response).getBody();
     }
 
     @GetMapping("/mutation")

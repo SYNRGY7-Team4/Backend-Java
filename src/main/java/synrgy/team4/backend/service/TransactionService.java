@@ -5,12 +5,15 @@ import synrgy.team4.backend.model.dto.response.MutationResponse;
 import synrgy.team4.backend.model.entity.Transaction;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface TransactionService {
     BaseResponse<List<MutationResponse>> getMutations(String accountNumber);
+
+    BaseResponse<List<MutationResponse>> getMutationsByDate(String accountNumber, LocalDateTime startDate, LocalDateTime endDate);
 
     Optional<Transaction> getMutationById(UUID id);
 
