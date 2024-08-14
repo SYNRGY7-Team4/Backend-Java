@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/forget-password/")
+@RequestMapping("/forget-password")
 public class ForgetPasswordController {
 
     @Autowired
