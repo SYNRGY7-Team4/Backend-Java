@@ -1,10 +1,8 @@
 package synrgy.team4.backend.model.dto.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
@@ -21,7 +19,7 @@ public class RegisterUserRequest {
     @JsonProperty("no_hp")
     private String noHP;
 
-    @NotEmpty(message = "Password cannot be empty")
+    @NotBlank(message = "Password cannot be empty")
     private String password;
 
     @NotBlank(message = "KTP number cannot be empty")
