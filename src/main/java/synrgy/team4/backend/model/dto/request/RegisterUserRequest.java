@@ -15,7 +15,7 @@ public class RegisterUserRequest {
     private String email;
 
     @NotBlank(message = "Phone number cannot be empty")
-    @Pattern(regexp = "\\d{12}", message = "Phone number must be exactly 12 digits")
+    @Pattern(regexp = "\\d{11,13}", message = "Phone number must be between 11 and 13 digits")
     @JsonProperty("no_hp")
     private String noHP;
 
