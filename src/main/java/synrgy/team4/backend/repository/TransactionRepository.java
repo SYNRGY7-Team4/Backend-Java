@@ -10,6 +10,7 @@ import java.util.UUID;
 
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
     List<Transaction> findByAccountFromAccountNumberOrAccountToAccountNumber(String accountNumberFrom, String accountNumberTo);
+    List<Transaction> findByStatusAndDatetimeLessThanEqual(String status, LocalDateTime datetime);
 
     List<Transaction> findByDatetimeBetweenAndType(LocalDateTime datetime, LocalDateTime datetime2, String type);
 }
