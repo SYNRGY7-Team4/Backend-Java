@@ -100,4 +100,16 @@ public class AuthController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PostMapping("/check-ktp")
+    public ResponseEntity<BaseResponse<String>> checkKTP(@Valid @RequestBody CheckKTPRequest request) {
+        authService.checkKTP(request);
+
+        BaseResponse<String> response = BaseResponse.<String>builder()
+                .success(true)
+                .data("KTP is available.")
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
