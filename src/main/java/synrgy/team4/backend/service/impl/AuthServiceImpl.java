@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import synrgy.team4.backend.model.dto.request.CheckEmailRequest;
 import synrgy.team4.backend.model.dto.request.LoginRequest;
 import synrgy.team4.backend.model.dto.request.RegisterUserRequest;
 import synrgy.team4.backend.model.dto.response.LoginResponse;
@@ -161,5 +162,12 @@ public class AuthServiceImpl implements AuthService {
                 .jwtToken(jwtToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    @Override
+    public void checkEmail(CheckEmailRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already registered");
+        }
     }
 }
