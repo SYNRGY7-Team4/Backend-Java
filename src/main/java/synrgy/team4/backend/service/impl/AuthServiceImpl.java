@@ -20,11 +20,14 @@ import synrgy.team4.backend.repository.AccountRepository;
 import synrgy.team4.backend.repository.UserRepository;
 import synrgy.team4.backend.security.jwt.service.JwtService;
 import synrgy.team4.backend.service.AuthService;
+import synrgy.team4.backend.service.OtpService;
 import synrgy.team4.backend.service.TokenService;
 import synrgy.team4.backend.utils.*;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -38,6 +41,10 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final TokenService tokenService;
+    private final EmailSender emailSender;
+    private final OtpService otpService;
+    private final Map<String, RegisterUserRequest> temporaryUserDataStorage = new HashMap<>();
+
 
     @Autowired
     public AuthServiceImpl(
@@ -46,13 +53,17 @@ public class AuthServiceImpl implements AuthService {
             AuthenticationManager authenticationManager,
             JwtService jwtService,
             TokenService tokenService,
-            AccountRepository accountRepository) {
+            AccountRepository accountRepository,
+            EmailSender emailSender,
+            OtpService otpService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.tokenService = tokenService;
         this.accountRepository = accountRepository;
+        this.emailSender = emailSender;
+        this.otpService = otpService;
     }
 
     /**
@@ -62,25 +73,31 @@ public class AuthServiceImpl implements AuthService {
      * @return UserResponse object containing the registered user's details
      * @throws ResponseStatusException if email, phone number, or KTP number already exists
      */
+
     @Override
     public UserResponse register(RegisterUserRequest request) {
-        // Check for existing email
+        // Ambil data sementara berdasarkan email
+        RegisterUserRequest tempRequest = otpService.getTemporaryUserData(request.getEmail());
+
+        // Validasi apakah data ada dan OTP sudah diverifikasi
+        if (tempRequest == null || !tempRequest.isVerified()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "OTP not verified or data not found.");
+        }
+        System.out.println("Data found and OTP verified for: " + tempRequest.getEmail());
+        // Validasi jika email, noHP, atau noKTP sudah ada di database
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already registered");
         }
-        // Check for existing phone number
         if (userRepository.existsByNoHP(request.getNoHP())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No HP already registered");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Phone number already registered");
         }
-        // Check for existing KTP Number
         if (userRepository.existsByNoKTP(request.getNoKTP())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No KTP already registered");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "KTP number already registered");
         }
-        // Check for existing Account number
         if (accountRepository.existsByAccountNumber(AccountNumberGenerator.generateAccountNumber())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nomor Akun already registered");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Account number already registered");
         }
-
+        otpService.removeTemporaryUserData(request.getEmail());
         // Parsing DOB
         Date dateOfBirth = ValidateDate.parseDate(request.getDateOfBirth());
 
@@ -97,7 +114,7 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
 
-        // Build and save the new User entity
+        // Build and save the new Account entity
         Account account = Account.builder()
                 .accountNumber(AccountNumberGenerator.generateAccountNumber())
                 .balance(BigDecimal.valueOf(0.0))
@@ -106,6 +123,9 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         accountRepository.save(account);
+
+        // Setelah berhasil registrasi, hapus data sementara untuk email tersebut
+        otpService.removeTemporaryUserData(request.getEmail());
 
         return UserResponse.builder()
                 .name(user.getName())

@@ -63,6 +63,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/auth/login", "/auth/register").permitAll()
                         .requestMatchers("/forget-password/**").permitAll()
+                        .requestMatchers("/send-otp/**", "/verify-otp/**").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 )
