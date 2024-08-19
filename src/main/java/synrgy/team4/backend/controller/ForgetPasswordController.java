@@ -1,65 +1,65 @@
 package synrgy.team4.backend.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import synrgy.team4.backend.config.EmailConfig;
 import synrgy.team4.backend.model.dto.request.ResetPasswordModel;
+import synrgy.team4.backend.model.dto.response.BaseResponse;
 import synrgy.team4.backend.model.entity.User;
 import synrgy.team4.backend.repository.UserRepository;
-import synrgy.team4.backend.service.UserService;
 import synrgy.team4.backend.service.impl.EmailSender;
 import synrgy.team4.backend.utils.EmailTemplate;
-import synrgy.team4.backend.utils.Response;
 import synrgy.team4.backend.utils.SimpleStringUtils;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/forget-password")
 public class ForgetPasswordController {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    EmailConfig emailConfig = new EmailConfig();
-
-    @Autowired
-    public UserService serviceReq;
+    private final UserRepository userRepository;
 
     @Value("${expired.token.password.minute:30}")
     private int expiredToken;
 
-    @Autowired
-    public Response templateEror;
+    private final EmailTemplate emailTemplate;
 
-    @Autowired
-    public EmailTemplate emailTemplate;
+    private final EmailSender emailSender;
 
-    @Autowired
-    public EmailSender emailSender;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public ForgetPasswordController(
+            UserRepository userRepository,
+            EmailTemplate emailTemplate,
+            EmailSender emailSender,
+            PasswordEncoder passwordEncoder
+    ) {
+        this.userRepository = userRepository;
+        this.emailTemplate = emailTemplate;
+        this.emailSender = emailSender;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     // Step 1 : Send OTP
     @PostMapping("/send")//send OTP//send OTP
-    public Map sendEmailPassword(@RequestBody ResetPasswordModel user) {
-        String message = "Thanks, please check your email";
-
-        if (StringUtils.isEmpty(user.getEmail())) return templateEror.templateEror("No email provided");
+    public ResponseEntity<BaseResponse<String>> sendEmailPassword(@RequestBody ResetPasswordModel user) {
+        if (user.getEmail().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No email provided");
+        }
         User found = userRepository.findOneByUsername(user.getEmail());
-        if (found == null) return templateEror.templateEror("Email not found"); //throw new BadRequest("Email not found");
+        if (found == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found with email " + user.getEmail());
 
         String template = emailTemplate.getResetPassword();
-        if (StringUtils.isEmpty(found.getOtp())) {
+        if (found.getOtp() == null) {
             User search;
             String otp;
             do {
@@ -88,34 +88,43 @@ public class ForgetPasswordController {
                     "@" + found.getUsername()));
             template = template.replaceAll("\\{\\{PASS_TOKEN}}", found.getOtp());
         }
-        emailSender.sendAsync(found.getUsername(), "Chute - Forget Password", template);
+        emailSender.sendAsync(found.getUsername(), "Lumi - Forget Password", template);
 
 
-        return templateEror.templateSuksess("success");
+        BaseResponse<String> response = BaseResponse.<String>builder()
+                .success(true)
+                .message("OTP has been sent to your email")
+                .build();
 
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     //Step 2 : CHek TOKEN OTP EMAIL
     @PostMapping("/validate")
-    public Map cheKTOkenValid(@RequestBody ResetPasswordModel model) {
-        if (model.getOtp() == null) return templateEror.templateEror("Token is required");
+    public ResponseEntity<BaseResponse<String>> cheKTokenValid(@RequestBody ResetPasswordModel model) {
+        if (model.getOtp() == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token is required");
 
         User user = userRepository.findOneByOTP(model.getOtp());
         if (user == null) {
-            return templateEror.templateEror("Token not valid");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token not valid");
         }
 
-        return templateEror.templateSuksess("Success");
+        BaseResponse<String> response = BaseResponse.<String>builder()
+                .success(true)
+                .message("Token valid")
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // Step 3 : lakukan reset password baru
     @PostMapping("/change-password")
-    public Map resetPassword(@RequestBody ResetPasswordModel model) {
-        if (model.getOtp() == null) return templateEror.templateEror("Token is required");
-        if (model.getNewPassword() == null) return templateEror.templateEror("New Password is required");
+    public ResponseEntity<BaseResponse<String>> resetPassword(@RequestBody ResetPasswordModel model) {
+        if (model.getOtp() == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token is required");
+        if (model.getNewPassword() == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "New password is required");
         User user = userRepository.findOneByOTP(model.getOtp());
-        String success;
-        if (user == null) return templateEror.templateEror("Token not valid");
+        if (user == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token not valid");
 
         user.setPassword(passwordEncoder.encode(model.getNewPassword().replaceAll("\\s+", "")));
         user.setOtpExpiredDate(null);
@@ -123,10 +132,15 @@ public class ForgetPasswordController {
 
         try {
             userRepository.save(user);
-            success = "success";
         } catch (Exception e) {
-            return templateEror.templateEror("Gagal simpan user");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to reset password");
         }
-        return templateEror.templateSuksess(success);
+
+        BaseResponse<String> response = BaseResponse.<String>builder()
+                .success(true)
+                .message("Change password successfully")
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
