@@ -10,8 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import synrgy.team4.backend.model.dto.request.LoginRequest;
-import synrgy.team4.backend.model.dto.request.RegisterUserRequest;
+import synrgy.team4.backend.model.dto.request.*;
 import synrgy.team4.backend.model.dto.response.LoginResponse;
 import synrgy.team4.backend.model.dto.response.UserResponse;
 import synrgy.team4.backend.model.entity.Account;
@@ -161,5 +160,26 @@ public class AuthServiceImpl implements AuthService {
                 .jwtToken(jwtToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    @Override
+    public void checkEmail(CheckEmailRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already registered");
+        }
+    }
+
+    @Override
+    public void checkPhoneNumber(CheckPhoneRequest request) {
+        if (userRepository.existsByNoHP(request.getNoHP())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No HP already registered");
+        }
+    }
+
+    @Override
+    public void checkKTP(CheckKTPRequest request) {
+        if (userRepository.existsByNoKTP(request.getNoKTP())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No KTP already registered");
+        }
     }
 }

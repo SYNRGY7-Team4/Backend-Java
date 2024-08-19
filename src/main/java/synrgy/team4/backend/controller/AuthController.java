@@ -6,9 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import synrgy.team4.backend.model.dto.request.LoginRequest;
-import synrgy.team4.backend.model.dto.request.RefreshTokenRequest;
-import synrgy.team4.backend.model.dto.request.RegisterUserRequest;
+import synrgy.team4.backend.model.dto.request.*;
 import synrgy.team4.backend.model.dto.response.BaseResponse;
 import synrgy.team4.backend.model.dto.response.LoginResponse;
 import synrgy.team4.backend.model.dto.response.UserResponse;
@@ -28,26 +26,18 @@ public class AuthController {
         this.authService = authService;
         this.tokenService = tokenService;
     }
+
     @PostMapping("/register")
     public ResponseEntity<BaseResponse<UserResponse>> register(
             @Valid @RequestBody RegisterUserRequest request
     ) {
-        try {
-            UserResponse userResponse = authService.register(request);
-            BaseResponse<UserResponse> response = BaseResponse.<UserResponse>builder()
-                    .success(true)
-                    .data(userResponse)
-                    .message("User registered successfully.")
-                    .build();
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        } catch (Exception e) {
-            BaseResponse<UserResponse> errorResponse = BaseResponse.<UserResponse>builder()
-                    .success(false)
-                    .data(null)
-                    .message("Registration failed: " + e.getMessage())
-                    .build();
-            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        UserResponse userResponse = authService.register(request);
+        BaseResponse<UserResponse> response = BaseResponse.<UserResponse>builder()
+                .success(true)
+                .data(userResponse)
+                .message("User registered successfully.")
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
@@ -82,6 +72,42 @@ public class AuthController {
         BaseResponse<LoginResponse> response = BaseResponse.<LoginResponse>builder()
                 .success(true)
                 .data(loginResponse)
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/check-email")
+    public ResponseEntity<BaseResponse<String>> checkEmail(@Valid @RequestBody CheckEmailRequest request) {
+        authService.checkEmail(request);
+
+        BaseResponse<String> response = BaseResponse.<String>builder()
+                .success(true)
+                .data("Email is available.")
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/check-phone-number")
+    public ResponseEntity<BaseResponse<String>> checkPhoneNumber(@Valid @RequestBody CheckPhoneRequest request) {
+        authService.checkPhoneNumber(request);
+
+        BaseResponse<String> response = BaseResponse.<String>builder()
+                .success(true)
+                .data("Phone number is available.")
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/check-ktp")
+    public ResponseEntity<BaseResponse<String>> checkKTP(@Valid @RequestBody CheckKTPRequest request) {
+        authService.checkKTP(request);
+
+        BaseResponse<String> response = BaseResponse.<String>builder()
+                .success(true)
+                .data("KTP is available.")
                 .build();
 
         return new ResponseEntity<>(response, HttpStatus.OK);
