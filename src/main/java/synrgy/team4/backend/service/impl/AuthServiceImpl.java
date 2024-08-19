@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import synrgy.team4.backend.model.dto.request.CheckEmailRequest;
+import synrgy.team4.backend.model.dto.request.CheckPhoneRequest;
 import synrgy.team4.backend.model.dto.request.LoginRequest;
 import synrgy.team4.backend.model.dto.request.RegisterUserRequest;
 import synrgy.team4.backend.model.dto.response.LoginResponse;
@@ -168,6 +169,13 @@ public class AuthServiceImpl implements AuthService {
     public void checkEmail(CheckEmailRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already registered");
+        }
+    }
+
+    @Override
+    public void checkPhoneNumber(CheckPhoneRequest request) {
+        if (userRepository.existsByNoHP(request.getNoHP())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No HP already registered");
         }
     }
 }

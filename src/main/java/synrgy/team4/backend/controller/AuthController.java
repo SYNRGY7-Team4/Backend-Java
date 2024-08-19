@@ -6,10 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import synrgy.team4.backend.model.dto.request.CheckEmailRequest;
-import synrgy.team4.backend.model.dto.request.LoginRequest;
-import synrgy.team4.backend.model.dto.request.RefreshTokenRequest;
-import synrgy.team4.backend.model.dto.request.RegisterUserRequest;
+import synrgy.team4.backend.model.dto.request.*;
 import synrgy.team4.backend.model.dto.response.BaseResponse;
 import synrgy.team4.backend.model.dto.response.LoginResponse;
 import synrgy.team4.backend.model.dto.response.UserResponse;
@@ -87,6 +84,18 @@ public class AuthController {
         BaseResponse<String> response = BaseResponse.<String>builder()
                 .success(true)
                 .data("Email is available.")
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/check-phone-number")
+    public ResponseEntity<BaseResponse<String>> checkPhoneNumber(@Valid @RequestBody CheckPhoneRequest request) {
+        authService.checkPhoneNumber(request);
+
+        BaseResponse<String> response = BaseResponse.<String>builder()
+                .success(true)
+                .data("Phone number is available.")
                 .build();
 
         return new ResponseEntity<>(response, HttpStatus.OK);
