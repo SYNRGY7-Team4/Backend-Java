@@ -1,6 +1,10 @@
 package synrgy.team4.backend.service.impl;
 
+import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import synrgy.team4.backend.model.dto.response.BaseResponse;
@@ -23,6 +27,8 @@ import java.util.stream.Collectors;
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
+
+    private static final Logger log = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
     public TransactionServiceImpl(TransactionRepository transactionRepository, AccountRepository accountRepository, UserRepository userRepository) {
         this.transactionRepository = transactionRepository;
@@ -100,32 +106,73 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction makeTransaction(String accountFromNumber, String accountToNumber, BigDecimal amount, String description) {
+    @Transactional
+    public Transaction makeTransaction(String accountFromNumber, String accountToNumber, BigDecimal amount, String description, String status, LocalDateTime dateTime) {
         Account accountFrom = accountRepository.findByAccountNumber(accountFromNumber)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Source account not found"));
-        Account accountTo = accountRepository.findByAccountNumber(accountToNumber).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Destination account not found"));
+        Account accountTo = accountRepository.findByAccountNumber(accountToNumber)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Destination account not found"));
 
         if (accountFrom.getBalance().compareTo(amount) < 0) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Insufficient funds.");
         }
 
-        accountFrom.setBalance(accountFrom.getBalance().subtract(amount));
-        accountTo.setBalance(accountTo.getBalance().add(amount));
+        if (status.equals("completed")) {
+            accountFrom.setBalance(accountFrom.getBalance().subtract(amount));
+            accountTo.setBalance(accountTo.getBalance().add(amount));
+
+            accountRepository.save(accountFrom);
+            accountRepository.save(accountTo);
+        }
 
         Transaction transaction = Transaction.builder()
                 .accountFrom(accountFrom)
                 .accountTo(accountTo)
                 .amount(amount)
-                .datetime(LocalDateTime.now())
+                .datetime(dateTime != null ? dateTime : LocalDateTime.now().plusSeconds(10))
                 .type("transfer")
-                .status("completed")
+                .status(status)
                 .description(description)
                 .build();
+        log.info("Received datetime for transaction: {}", dateTime);
 
-        accountRepository.save(accountFrom);
-        accountRepository.save(accountTo);
-        transactionRepository.save(transaction);
-
-        return  transaction;
+        return transactionRepository.save(transaction);
     }
+
+    @Override
+    @Scheduled(cron = "*/1 * * * * ?", zone = "Asia/Jakarta")
+    public void processScheduledTransfers() {
+        LocalDateTime now = LocalDateTime.now().withSecond(0).withNano(0);
+        List<Transaction> scheduledTransactions = transactionRepository.findByStatusAndDatetimeLessThanEqual("pending", now);
+
+        for (Transaction transaction : scheduledTransactions) {
+            if (transaction.getDatetime().isBefore(now.plusSeconds(60))) {
+                try {
+                    Account accountFrom = transaction.getAccountFrom();
+                    Account accountTo = transaction.getAccountTo();
+
+                    if (accountFrom.getBalance().compareTo(transaction.getAmount()) < 0) {
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Insufficient funds.");
+                    }
+
+                    accountFrom.setBalance(accountFrom.getBalance().subtract(transaction.getAmount()));
+                    accountTo.setBalance(accountTo.getBalance().add(transaction.getAmount()));
+
+                    transaction.setStatus("completed");
+
+                    accountRepository.save(accountFrom);
+                    accountRepository.save(accountTo);
+                    transactionRepository.save(transaction);
+
+                    log.info("Transfer processed for account: {}", transaction.getAccountFrom().getAccountNumber());
+                } catch (Exception e) {
+                    transaction.setStatus("failed");
+                    transactionRepository.save(transaction);
+                    log.error("Error processing transfer for account: {}", transaction.getAccountFrom().getAccountNumber(), e);
+                }
+            }
+        }
+    }
+
 }
+

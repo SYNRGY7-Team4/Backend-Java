@@ -19,5 +19,7 @@ public interface TransactionService {
 
     Optional<Transaction> getTransactionById(UUID id);
 
-    Transaction makeTransaction(String accountFromNumber, String accountToNumber, BigDecimal amount, String description);
+    Transaction makeTransaction(String accountFromNumber, String accountToNumber, BigDecimal amount, String description, String status, LocalDateTime dateTime);
+
+    void processScheduledTransfers();
 }

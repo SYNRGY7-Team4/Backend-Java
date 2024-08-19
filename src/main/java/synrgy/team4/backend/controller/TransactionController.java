@@ -13,9 +13,7 @@ import synrgy.team4.backend.model.dto.response.MutationResponse;
 import synrgy.team4.backend.model.dto.response.TransactionResponse;
 import synrgy.team4.backend.model.entity.Account;
 import synrgy.team4.backend.model.entity.Transaction;
-import synrgy.team4.backend.model.entity.User;
 import synrgy.team4.backend.security.jwt.CustomUserDetails;
-import synrgy.team4.backend.service.TransactionService;
 import synrgy.team4.backend.service.impl.TransactionServiceImpl;
 import synrgy.team4.backend.service.impl.UserServiceImpl;
 import synrgy.team4.backend.utils.PinHashing;
@@ -120,7 +118,8 @@ public class TransactionController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Incorrect pin.");
         }
 
-        Transaction transaction = transactionService.makeTransaction(request.getAccountFrom(), request.getAccountTo(), request.getAmount(), request.getDescription());
+        // Add the missing arguments
+        Transaction transaction = transactionService.makeTransaction(request.getAccountFrom(), request.getAccountTo(), request.getAmount(), request.getDescription(), "completed", null);
 
         // Get the user names for both accounts involved in the transaction
         String userAccountFrom = transaction.getAccountFrom().getUser().getName();
@@ -144,6 +143,45 @@ public class TransactionController {
                 .success(true)
                 .data(transactionResponse)
                 .message("Transfer successful.")
+                .build();
+    }
+
+    @PostMapping("/schedule")
+    public BaseResponse<TransactionResponse> scheduleTransfer(
+            @RequestBody TransferRequest request,
+            Authentication authentication) {
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        List<Account> accounts = userDetails.getAccounts();
+        Account account = accounts.stream()
+                .filter(acc -> acc.getAccountNumber().equals(request.getAccountFrom()))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to access this account."));
+
+        if (!PinHashing.verifyPin(request.getPin(), account.getPin())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Incorrect pin.");
+        }
+
+        // Ensure you pass all 6 arguments here
+        Transaction transaction = transactionService.makeTransaction(request.getAccountFrom(), request.getAccountTo(), request.getAmount(), request.getDescription(), "pending", request.getDatetime());
+
+        TransactionResponse transactionResponse = new TransactionResponse();
+        transactionResponse.setId(transaction.getId());
+        transactionResponse.setAccountFrom(transaction.getAccountFrom().getAccountNumber());
+        transactionResponse.setNameAccountFrom(transaction.getAccountFrom().getUser().getName());
+        transactionResponse.setAccountTo(transaction.getAccountTo().getAccountNumber());
+        transactionResponse.setNameAccountTo(transaction.getAccountTo().getUser().getName());
+        transactionResponse.setAmount(transaction.getAmount());
+        transactionResponse.setDatetime(transaction.getDatetime());
+        transactionResponse.setType(transaction.getType());
+        transactionResponse.setStatus(transaction.getStatus());
+        transactionResponse.setDescription(transaction.getDescription());
+        transactionResponse.setBalance(account.getBalance());
+
+        return BaseResponse.<TransactionResponse>builder()
+                .success(true)
+                .data(transactionResponse)
+                .message("Transfer scheduled successfully.")
                 .build();
     }
 
