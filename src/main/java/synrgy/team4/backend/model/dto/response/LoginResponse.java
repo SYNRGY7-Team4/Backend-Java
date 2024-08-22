@@ -18,6 +18,8 @@ public class LoginResponse {
     @Schema(example = "user1@gmail.com")
     private String email;
 
+
+
     @Schema(example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
     @JsonProperty("jwt_token")
     private String jwtToken;

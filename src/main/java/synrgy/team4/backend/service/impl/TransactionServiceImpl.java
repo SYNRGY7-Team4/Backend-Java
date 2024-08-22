@@ -7,13 +7,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import synrgy.team4.backend.model.dto.request.NotificationRequest;
 import synrgy.team4.backend.model.dto.response.BaseResponse;
 import synrgy.team4.backend.model.dto.response.MutationResponse;
 import synrgy.team4.backend.model.entity.Account;
+import synrgy.team4.backend.model.entity.Notification;
 import synrgy.team4.backend.model.entity.Transaction;
+import synrgy.team4.backend.model.entity.User;
 import synrgy.team4.backend.repository.AccountRepository;
+import synrgy.team4.backend.repository.NotificationRepository;
 import synrgy.team4.backend.repository.TransactionRepository;
 import synrgy.team4.backend.repository.UserRepository;
+import synrgy.team4.backend.service.FCMService;
 import synrgy.team4.backend.service.TransactionService;
 
 import java.math.BigDecimal;
@@ -21,18 +26,22 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
-
+    private final NotificationRepository notificationRepository;
+    private final FCMService fcmService;
     private static final Logger log = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
-    public TransactionServiceImpl(TransactionRepository transactionRepository, AccountRepository accountRepository, UserRepository userRepository) {
+    public TransactionServiceImpl(TransactionRepository transactionRepository, AccountRepository accountRepository, UserRepository userRepository, NotificationRepository notificationRepository , FCMService fcmService) {
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
+        this.notificationRepository = notificationRepository;
+        this.fcmService = fcmService;
     }
 
     @Override
@@ -123,6 +132,33 @@ public class TransactionServiceImpl implements TransactionService {
 
             accountRepository.save(accountFrom);
             accountRepository.save(accountTo);
+
+            // Cari FCM token dari user yang terkait dengan accountTo
+            User userTo = accountTo.getUser();
+            if (userTo != null && userTo.getFCMToken() != null) {
+                // Kirim notifikasi menggunakan FCMService
+                NotificationRequest notificationRequest = new NotificationRequest();
+                notificationRequest.setToken(userTo.getFCMToken());
+                notificationRequest.setTitle("Transfer Masuk");
+                notificationRequest.setBody("Anda menerima transfer sebesar Rp " + amount + " dari akun " + accountFromNumber);
+                notificationRequest.setTopic("transfer");
+
+                try {
+                    fcmService.sendMessageToToken(notificationRequest);
+                    // Simpan notifikasi ke database
+                    Notification notification = Notification.builder()
+                            .user(userTo)
+                            .title(notificationRequest.getTitle())
+                            .body(notificationRequest.getBody())
+                            .sentAt(LocalDateTime.now())
+                            .build();
+                    notificationRepository.save(notification);
+                } catch (InterruptedException | ExecutionException e) {
+                    // Tangani error jika pengiriman notifikasi gagal
+                    log.error("Failed to send notification to user: " + userTo);
+                    e.printStackTrace();
+                }
+            }
         }
 
         Transaction transaction = Transaction.builder()

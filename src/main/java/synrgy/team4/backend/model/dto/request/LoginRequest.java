@@ -17,4 +17,5 @@ public class LoginRequest {
     @NotEmpty(message = "Password cannot be empty")
     @Schema(example = "passworduser1")
     private String password;
+
 }

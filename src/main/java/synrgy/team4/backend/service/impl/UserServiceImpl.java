@@ -41,6 +41,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return new CustomUserDetails(user); // Return CustomUserDetails instance
     }
 
+    @Transactional
+    public void updateFCMToken(User user, String fcmToken) {
+        user.setFCMToken(fcmToken);
+        userRepository.save(user);
+    }
+
     @Override
     public UserResponse getUserResponse() {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

@@ -49,6 +49,9 @@ public class User extends BaseModel implements UserDetails {
     @Schema(example = "passworduser1")
     private String password;
 
+    @Column(name = "fcm_token")
+    private String FCMToken;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
@@ -57,6 +60,7 @@ public class User extends BaseModel implements UserDetails {
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Account> accounts;
+
 
     @Column(length = 100, nullable = true)
     private String otp;
