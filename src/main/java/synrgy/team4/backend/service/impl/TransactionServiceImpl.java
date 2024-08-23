@@ -133,30 +133,32 @@ public class TransactionServiceImpl implements TransactionService {
             accountRepository.save(accountFrom);
             accountRepository.save(accountTo);
 
-            // Cari FCM token dari user yang terkait dengan accountTo
+            // Simpan notifikasi ke database
             User userTo = accountTo.getUser();
-            if (userTo != null && userTo.getFCMToken() != null) {
-                // Kirim notifikasi menggunakan FCMService
-                NotificationRequest notificationRequest = new NotificationRequest();
-                notificationRequest.setToken(userTo.getFCMToken());
-                notificationRequest.setTitle("Transfer Masuk");
-                notificationRequest.setBody("Anda menerima transfer sebesar Rp " + amount + " dari akun " + accountFromNumber);
-                notificationRequest.setTopic("transfer");
+            if (userTo != null) {
+                Notification notification = Notification.builder()
+                        .user(userTo)
+                        .title("Transfer Masuk")
+                        .body("Anda menerima transfer sebesar Rp " + amount + " dari akun " + accountFromNumber)
+                        .sentAt(LocalDateTime.now())
+                        .build();
+                notificationRepository.save(notification);
 
-                try {
-                    fcmService.sendMessageToToken(notificationRequest);
-                    // Simpan notifikasi ke database
-                    Notification notification = Notification.builder()
-                            .user(userTo)
-                            .title(notificationRequest.getTitle())
-                            .body(notificationRequest.getBody())
-                            .sentAt(LocalDateTime.now())
-                            .build();
-                    notificationRepository.save(notification);
-                } catch (InterruptedException | ExecutionException e) {
-                    // Tangani error jika pengiriman notifikasi gagal
-                    log.error("Failed to send notification to user: " + userTo);
-                    e.printStackTrace();
+                // Cek dan kirim notifikasi menggunakan FCM jika token tersedia
+                if (userTo.getFCMToken() != null) {
+                    NotificationRequest notificationRequest = new NotificationRequest();
+                    notificationRequest.setToken(userTo.getFCMToken());
+                    notificationRequest.setTitle(notification.getTitle());
+                    notificationRequest.setBody(notification.getBody());
+                    notificationRequest.setTopic("transfer");
+
+                    try {
+                        fcmService.sendMessageToToken(notificationRequest);
+                    } catch (InterruptedException | ExecutionException e) {
+                        // Tangani error jika pengiriman notifikasi gagal
+                        log.error("Failed to send notification to user: " + userTo);
+                        e.printStackTrace();
+                    }
                 }
             }
         }
