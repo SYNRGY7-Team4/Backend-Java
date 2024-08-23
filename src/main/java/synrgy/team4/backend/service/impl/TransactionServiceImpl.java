@@ -10,8 +10,11 @@ import org.springframework.web.server.ResponseStatusException;
 import synrgy.team4.backend.model.dto.response.BaseResponse;
 import synrgy.team4.backend.model.dto.response.MutationResponse;
 import synrgy.team4.backend.model.entity.Account;
+import synrgy.team4.backend.model.entity.Notification;
 import synrgy.team4.backend.model.entity.Transaction;
+import synrgy.team4.backend.model.entity.User;
 import synrgy.team4.backend.repository.AccountRepository;
+import synrgy.team4.backend.repository.NotificationRepository;
 import synrgy.team4.backend.repository.TransactionRepository;
 import synrgy.team4.backend.repository.UserRepository;
 import synrgy.team4.backend.service.TransactionService;
@@ -28,12 +31,13 @@ import java.util.stream.Collectors;
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
-
+    private final NotificationRepository notificationRepository;
     private static final Logger log = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
-    public TransactionServiceImpl(TransactionRepository transactionRepository, AccountRepository accountRepository, UserRepository userRepository) {
+    public TransactionServiceImpl(TransactionRepository transactionRepository, NotificationRepository notificationRepository, AccountRepository accountRepository, UserRepository userRepository) {
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
+        this.notificationRepository = notificationRepository;
     }
 
     @Override
@@ -124,6 +128,20 @@ public class TransactionServiceImpl implements TransactionService {
 
             accountRepository.save(accountFrom);
             accountRepository.save(accountTo);
+
+            // Simpan notifikasi ke database
+            User userTo = accountTo.getUser();
+            if (userTo != null) {
+                Notification notification = Notification.builder()
+                        .user(userTo)
+                        .title("Transfer Masuk")
+                        .body("Anda menerima transfer sebesar Rp " + amount + " dari akun " + accountFromNumber)
+                        .sentAt(LocalDateTime.now())
+                        .build();
+                notificationRepository.save(notification);
+            } else {
+                log.info("User not found for account number: {}", accountToNumber);
+            }
         }
 
         String generatedReference = generateReferenceNumber();

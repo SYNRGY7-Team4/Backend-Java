@@ -1,0 +1,22 @@
+package synrgy.team4.backend.service.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import synrgy.team4.backend.model.entity.Notification;
+import synrgy.team4.backend.repository.NotificationRepository;
+import synrgy.team4.backend.service.NotificationService;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+public class NotificationServiceImpl implements NotificationService {
+
+    @Autowired
+    NotificationRepository notificationRepository;
+
+    @Override
+    public List<Notification> getNotificationsByUserId(UUID userId) {
+        return notificationRepository.findByUserId(userId);
+    }
+}
