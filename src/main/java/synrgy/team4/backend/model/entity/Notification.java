@@ -28,6 +28,10 @@ public class Notification {
     @Column(name = "sent_at", nullable = false)
     private LocalDateTime sentAt;
 
+
+    @Column(name = "is_read", nullable = false)
+    private boolean isRead = false;  // Default value is false
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @JsonIgnore

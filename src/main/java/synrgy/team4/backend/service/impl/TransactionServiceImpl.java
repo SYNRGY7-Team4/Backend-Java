@@ -129,7 +129,7 @@ public class TransactionServiceImpl implements TransactionService {
             accountRepository.save(accountFrom);
             accountRepository.save(accountTo);
 
-            // Simpan notifikasi ke database
+            // NOTIFIKASI PENERIMA
             User userTo = accountTo.getUser();
             if (userTo != null) {
                 Notification notification = Notification.builder()
@@ -139,6 +139,18 @@ public class TransactionServiceImpl implements TransactionService {
                         .sentAt(LocalDateTime.now())
                         .build();
                 notificationRepository.save(notification);
+
+                //NOTIFIKASI PENGIRIM
+                User userFrom = accountFrom.getUser();
+                if (userFrom != null) {
+                    Notification notificationFrom = Notification.builder()
+                            .user(userFrom)
+                            .title("Transfer Keluar")
+                            .body("Anda mengirim transfer sebesar Rp " + amount + " ke akun " + accountToNumber)
+                            .sentAt(LocalDateTime.now())
+                            .build();
+                    notificationRepository.save(notificationFrom);
+                }
             } else {
                 log.info("User not found for account number: {}", accountToNumber);
             }
@@ -191,6 +203,30 @@ public class TransactionServiceImpl implements TransactionService {
                     accountRepository.save(accountFrom);
                     accountRepository.save(accountTo);
                     transactionRepository.save(transaction);
+
+                    // NOTIFIKASI PENERIMA
+                    User userTo = accountTo.getUser();
+                    if (userTo != null) {
+                        Notification notificationTo = Notification.builder()
+                                .user(userTo)
+                                .title("Transfer Masuk")
+                                .body("Anda menerima transfer sebesar Rp " + transaction.getAmount() + " dari akun " + accountFrom.getAccountNumber())
+                                .sentAt(LocalDateTime.now())
+                                .build();
+                        notificationRepository.save(notificationTo);
+                    }
+
+                    // NOTIFIKASI PENGIRIM
+                    User userFrom = accountFrom.getUser();
+                    if (userFrom != null) {
+                        Notification notificationFrom = Notification.builder()
+                                .user(userFrom)
+                                .title("Transfer Keluar")
+                                .body("Anda mengirim transfer sebesar Rp " + transaction.getAmount() + " ke akun " + accountTo.getAccountNumber())
+                                .sentAt(LocalDateTime.now())
+                                .build();
+                        notificationRepository.save(notificationFrom);
+                    }
 
                     log.info("Transfer processed for account: {}", transaction.getAccountFrom().getAccountNumber());
                 } catch (Exception e) {

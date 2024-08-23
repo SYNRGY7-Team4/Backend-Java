@@ -9,4 +9,9 @@ import java.util.concurrent.ExecutionException;
 public interface NotificationService {
 
     List<Notification> getNotificationsByUserId(UUID userId);
+
+    void markNotificationAsRead(UUID notificationId);
+
+    void markAllNotificationsAsRead(UUID userId);
+
 }
