@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -107,7 +108,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public Transaction makeTransaction(String accountFromNumber, String accountToNumber, BigDecimal amount, String description, String status, LocalDateTime dateTime) {
+    public Transaction makeTransaction(String accountFromNumber, String accountToNumber, BigDecimal amount, String description, String status, LocalDateTime dateTime, String destinationBank) {
         Account accountFrom = accountRepository.findByAccountNumber(accountFromNumber)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Source account not found"));
         Account accountTo = accountRepository.findByAccountNumber(accountToNumber)
@@ -125,11 +126,16 @@ public class TransactionServiceImpl implements TransactionService {
             accountRepository.save(accountTo);
         }
 
+        String generatedReference = generateReferenceNumber();
+
         Transaction transaction = Transaction.builder()
                 .accountFrom(accountFrom)
                 .accountTo(accountTo)
                 .amount(amount)
                 .datetime(dateTime != null ? dateTime : LocalDateTime.now().plusSeconds(10))
+                .createdAt(LocalDateTime.now())
+                .destinationBank(destinationBank)
+                .referenceNumber(generatedReference)
                 .type("transfer")
                 .status(status)
                 .description(description)
@@ -137,6 +143,10 @@ public class TransactionServiceImpl implements TransactionService {
         log.info("Received datetime for transaction: {}", dateTime);
 
         return transactionRepository.save(transaction);
+    }
+
+    private String generateReferenceNumber() {
+        return String.format("%012d", new Random().nextInt(1000000000));
     }
 
     @Override

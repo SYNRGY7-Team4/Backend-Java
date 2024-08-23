@@ -15,4 +15,5 @@ public class TransferRequest {
     private String description;
     private String pin;
     private LocalDateTime datetime;
+    private String destinationBank;
 }
