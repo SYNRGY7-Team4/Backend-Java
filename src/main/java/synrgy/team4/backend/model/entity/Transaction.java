@@ -29,7 +29,10 @@ public class Transaction {
 
     private BigDecimal amount;
     private LocalDateTime datetime;
-    private String type; // e.g., "deposit", "withdrawal", "transfer"
+    private LocalDateTime createdAt;
+    private String type;
     private String status;
     private String description;
+    private String referenceNumber;
+    private String destinationBank;
 }

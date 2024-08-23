@@ -118,26 +118,26 @@ public class TransactionController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Incorrect pin.");
         }
 
-        // Add the missing arguments
-        Transaction transaction = transactionService.makeTransaction(request.getAccountFrom(), request.getAccountTo(), request.getAmount(), request.getDescription(), "completed", null);
+        Transaction transaction = transactionService.makeTransaction(request.getAccountFrom(), request.getAccountTo(), request.getAmount(), request.getDescription(), "completed", null, request.getDestinationBank());
 
-        // Get the user names for both accounts involved in the transaction
         String userAccountFrom = transaction.getAccountFrom().getUser().getName();
         String userAccountTo = transaction.getAccountTo().getUser().getName();
 
-        // Construct the response
         TransactionResponse transactionResponse = new TransactionResponse();
+        transactionResponse.setCreatedAt(transaction.getCreatedAt());
         transactionResponse.setId(transaction.getId());
+        transactionResponse.setReferenceNumber(transaction.getReferenceNumber());
         transactionResponse.setAccountFrom(transaction.getAccountFrom().getAccountNumber());
         transactionResponse.setNameAccountFrom(userAccountFrom);
         transactionResponse.setAccountTo(transaction.getAccountTo().getAccountNumber());
         transactionResponse.setNameAccountTo(userAccountTo);
+        transactionResponse.setDestinationBank(transaction.getDestinationBank());
         transactionResponse.setAmount(transaction.getAmount());
         transactionResponse.setDatetime(transaction.getDatetime());
         transactionResponse.setType(transaction.getType());
         transactionResponse.setStatus(transaction.getStatus());
         transactionResponse.setDescription(transaction.getDescription());
-        transactionResponse.setBalance(account.getBalance()); // Set balance
+        transactionResponse.setBalance(account.getBalance());
 
         return BaseResponse.<TransactionResponse>builder()
                 .success(true)
@@ -162,15 +162,17 @@ public class TransactionController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Incorrect pin.");
         }
 
-        // Ensure you pass all 6 arguments here
-        Transaction transaction = transactionService.makeTransaction(request.getAccountFrom(), request.getAccountTo(), request.getAmount(), request.getDescription(), "pending", request.getDatetime());
+        Transaction transaction = transactionService.makeTransaction(request.getAccountFrom(), request.getAccountTo(), request.getAmount(), request.getDescription(), "pending", request.getDatetime(), request.getDestinationBank());
 
         TransactionResponse transactionResponse = new TransactionResponse();
+        transactionResponse.setCreatedAt(transaction.getCreatedAt());
         transactionResponse.setId(transaction.getId());
+        transactionResponse.setReferenceNumber(transaction.getReferenceNumber());
         transactionResponse.setAccountFrom(transaction.getAccountFrom().getAccountNumber());
         transactionResponse.setNameAccountFrom(transaction.getAccountFrom().getUser().getName());
         transactionResponse.setAccountTo(transaction.getAccountTo().getAccountNumber());
         transactionResponse.setNameAccountTo(transaction.getAccountTo().getUser().getName());
+        transactionResponse.setDestinationBank(transaction.getDestinationBank());
         transactionResponse.setAmount(transaction.getAmount());
         transactionResponse.setDatetime(transaction.getDatetime());
         transactionResponse.setType(transaction.getType());

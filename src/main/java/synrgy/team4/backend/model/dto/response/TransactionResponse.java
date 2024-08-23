@@ -10,11 +10,14 @@ import java.util.UUID;
 @Getter
 @Setter
 public class TransactionResponse {
+    private LocalDateTime createdAt;
     private UUID id;
+    private String referenceNumber;
     private String accountFrom;
     private String nameAccountFrom;
     private String accountTo;
     private String nameAccountTo;
+    private String destinationBank;
     private BigDecimal amount;
     private LocalDateTime datetime;
     private String type;
