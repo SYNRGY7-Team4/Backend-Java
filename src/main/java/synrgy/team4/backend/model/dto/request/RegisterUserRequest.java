@@ -1,4 +1,5 @@
 package synrgy.team4.backend.model.dto.request;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.*;
@@ -41,4 +42,10 @@ public class RegisterUserRequest {
     @Pattern(regexp = "\\d{6}", message = "PIN must be exactly 6 digits")
     @JsonProperty("pin")
     private String pin;
+
+    @JsonProperty("otp")
+    private String otp;
+
+    @JsonProperty("is_verified")
+    private boolean isVerified;
 }

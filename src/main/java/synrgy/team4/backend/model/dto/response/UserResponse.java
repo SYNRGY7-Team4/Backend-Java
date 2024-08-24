@@ -12,7 +12,6 @@ import lombok.Setter;
 @Data
 public class UserResponse {
     private String name;
-
     private String email;
 
     @JsonProperty("no_ktp")
@@ -32,4 +31,5 @@ public class UserResponse {
 
     @JsonProperty("ektp_photo")
     private String ektpPhoto;
+
 }
