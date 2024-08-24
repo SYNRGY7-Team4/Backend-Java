@@ -36,6 +36,7 @@ public class RegisterUserRequest {
     private String dateOfBirth;
 
     @JsonProperty("ektp_photo")
+    @Size(max = 685000, message = "Ukuran foto E-KTP terlalu besar, maksimal 500KB")
     private String ektpPhoto;
 
     @NotBlank(message = "PIN cannot be empty")
