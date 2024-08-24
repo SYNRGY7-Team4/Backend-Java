@@ -1,12 +1,15 @@
 package synrgy.team4.backend.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import synrgy.team4.backend.model.dto.request.OtpRequest;
 import synrgy.team4.backend.model.dto.request.RegisterUserRequest;
+import synrgy.team4.backend.model.dto.request.VerifyOtpRequest;
 import synrgy.team4.backend.model.dto.response.BaseResponse;
 import synrgy.team4.backend.service.AuthService;
 import synrgy.team4.backend.service.OtpService;
@@ -23,17 +26,15 @@ public class SendOTPController {
     private OtpService otpService;
 
     @PostMapping("/send-otp")
-    public ResponseEntity<BaseResponse<Void>> sendOtp(@RequestBody RegisterUserRequest request) {
+    public ResponseEntity<BaseResponse<Void>> sendOtp(@Valid @RequestBody OtpRequest request) {
         try {
-            // Memastikan email belum terdaftar
-            if (otpService.isEmailRegistered(request.getEmail())) {
-                return new ResponseEntity<>(BaseResponse.<Void>builder()
-                        .success(false)
-                        .message("Email sudah terdaftar.")
-                        .build(), HttpStatus.BAD_REQUEST);
-            }
             otpService.sendOtp(request.getEmail(), request.getNoHP());
-            otpService.storeTemporaryUserData(request);
+
+            // Simpan atau perbarui data pengguna sementara
+            RegisterUserRequest registerUserRequest = new RegisterUserRequest();
+            registerUserRequest.setEmail(request.getEmail());
+            registerUserRequest.setNoHP(request.getNoHP());
+            otpService.storeTemporaryUserData(registerUserRequest);
 
             return new ResponseEntity<>(BaseResponse.<Void>builder()
                     .success(true)
@@ -48,10 +49,13 @@ public class SendOTPController {
     }
 
 
+
+
+
     @PostMapping("/verify-otp")
-    public ResponseEntity<BaseResponse<Void>> verifyOtp(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
-        String otp = request.get("otp");
+    public ResponseEntity<BaseResponse<Void>> verifyOtp(@RequestBody VerifyOtpRequest request) {
+        String email = request.getEmail();
+        String otp = request.getOtp();
 
         try {
             boolean isOtpValid = otpService.verifyOtp(email, otp);
@@ -73,4 +77,5 @@ public class SendOTPController {
                     .build(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }
