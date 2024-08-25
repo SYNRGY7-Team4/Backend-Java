@@ -33,7 +33,7 @@ public class MutationResponse {
     private String type; // e.g., "deposit", "withdrawal", "transfer"
     private String status;
     private String description;
-    private BigDecimal balance;
+    private BigDecimal currentBalance;
 
     public MutationResponse(UUID id, String accountNumber, String name, String accountNumber1, String name1, BigDecimal amount, LocalDateTime datetime, String type, String status, String description, AtomicReference<BigDecimal> currentBalance) {
     }

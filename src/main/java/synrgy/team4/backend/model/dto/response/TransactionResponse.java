@@ -23,5 +23,5 @@ public class TransactionResponse {
     private String type;
     private String status;
     private String description;
-    private BigDecimal balance;
+    private BigDecimal currentBalance;
 }

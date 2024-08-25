@@ -35,4 +35,5 @@ public class Transaction {
     private String description;
     private String referenceNumber;
     private String destinationBank;
+    private BigDecimal currentBalance;
 }

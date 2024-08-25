@@ -51,16 +51,7 @@ public class TransactionServiceImpl implements TransactionService {
         AtomicReference<BigDecimal> currentBalance = new AtomicReference<>(account.getBalance());
 
         List<MutationResponse> mutationResponses = transactions.stream()
-                .map(transaction -> {
-                    if ("transfer".equalsIgnoreCase(transaction.getType())) {
-                        if (transaction.getAccountFrom().getId().equals(account.getId())) {
-                            currentBalance.updateAndGet(balance -> balance.subtract(transaction.getAmount()));
-                        } else if (transaction.getAccountTo().getId().equals(account.getId())) {
-                            currentBalance.updateAndGet(balance -> balance.add(transaction.getAmount()));
-                        }
-                    }
-
-                    return new MutationResponse(
+                .map(transaction -> new MutationResponse(
                             transaction.getId(),
                             transaction.getAccountFrom().getAccountNumber(),
                             transaction.getAccountFrom().getUser().getName(),
@@ -71,9 +62,8 @@ public class TransactionServiceImpl implements TransactionService {
                             transaction.getType(),
                             transaction.getStatus(),
                             transaction.getDescription(),
-                            currentBalance
-                    );
-                })
+                            transaction.getCurrentBalance()
+                    ))
                 .collect(Collectors.toList());
 
         return BaseResponse.<List<MutationResponse>>builder()
@@ -102,7 +92,7 @@ public class TransactionServiceImpl implements TransactionService {
                         transaction.getType(),
                         transaction.getStatus(),
                         transaction.getDescription(),
-                        account.getBalance()
+                        transaction.getCurrentBalance()
                 ))
                 .collect(Collectors.toList());
 
@@ -182,6 +172,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .type("transfer")
                 .status(status)
                 .description(description)
+                .currentBalance(accountFrom.getBalance())
                 .build();
         log.info("Received datetime for transaction: {}", dateTime);
 

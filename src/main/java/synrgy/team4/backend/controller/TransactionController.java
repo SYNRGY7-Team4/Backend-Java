@@ -92,7 +92,7 @@ public class TransactionController {
                 transaction.getType(),
                 transaction.getStatus(),
                 transaction.getDescription(),
-                account.getBalance()
+                transaction.getCurrentBalance()
         );
 
         return BaseResponse.<MutationResponse>builder()
@@ -137,7 +137,7 @@ public class TransactionController {
         transactionResponse.setType(transaction.getType());
         transactionResponse.setStatus(transaction.getStatus());
         transactionResponse.setDescription(transaction.getDescription());
-        transactionResponse.setBalance(account.getBalance());
+        transactionResponse.setCurrentBalance(account.getBalance());
 
         return BaseResponse.<TransactionResponse>builder()
                 .success(true)
@@ -178,7 +178,7 @@ public class TransactionController {
         transactionResponse.setType(transaction.getType());
         transactionResponse.setStatus(transaction.getStatus());
         transactionResponse.setDescription(transaction.getDescription());
-        transactionResponse.setBalance(account.getBalance());
+        transactionResponse.setCurrentBalance(account.getBalance());
 
         return BaseResponse.<TransactionResponse>builder()
                 .success(true)
