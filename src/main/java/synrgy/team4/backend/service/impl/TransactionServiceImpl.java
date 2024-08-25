@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,20 +48,32 @@ public class TransactionServiceImpl implements TransactionService {
 
         List<Transaction> transactions = transactionRepository.findByAccountFromAccountNumberOrAccountToAccountNumber(accountNumber, accountNumber);
 
+        AtomicReference<BigDecimal> currentBalance = new AtomicReference<>(account.getBalance());
+
         List<MutationResponse> mutationResponses = transactions.stream()
-                .map(transaction -> new MutationResponse(
-                        transaction.getId(),
-                        transaction.getAccountFrom().getAccountNumber(),
-                        transaction.getAccountFrom().getUser().getName(),
-                        transaction.getAccountTo().getAccountNumber(),
-                        transaction.getAccountTo().getUser().getName(),
-                        transaction.getAmount(),
-                        transaction.getDatetime(),
-                        transaction.getType(),
-                        transaction.getStatus(),
-                        transaction.getDescription(),
-                        account.getBalance()
-                ))
+                .map(transaction -> {
+                    if ("transfer".equalsIgnoreCase(transaction.getType())) {
+                        if (transaction.getAccountFrom().getId().equals(account.getId())) {
+                            currentBalance.updateAndGet(balance -> balance.subtract(transaction.getAmount()));
+                        } else if (transaction.getAccountTo().getId().equals(account.getId())) {
+                            currentBalance.updateAndGet(balance -> balance.add(transaction.getAmount()));
+                        }
+                    }
+
+                    return new MutationResponse(
+                            transaction.getId(),
+                            transaction.getAccountFrom().getAccountNumber(),
+                            transaction.getAccountFrom().getUser().getName(),
+                            transaction.getAccountTo().getAccountNumber(),
+                            transaction.getAccountTo().getUser().getName(),
+                            transaction.getAmount(),
+                            transaction.getDatetime(),
+                            transaction.getType(),
+                            transaction.getStatus(),
+                            transaction.getDescription(),
+                            currentBalance
+                    );
+                })
                 .collect(Collectors.toList());
 
         return BaseResponse.<List<MutationResponse>>builder()

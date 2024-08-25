@@ -7,6 +7,7 @@ import synrgy.team4.backend.model.entity.User;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Getter
 @Setter
@@ -33,4 +34,7 @@ public class MutationResponse {
     private String status;
     private String description;
     private BigDecimal balance;
+
+    public MutationResponse(UUID id, String accountNumber, String name, String accountNumber1, String name1, BigDecimal amount, LocalDateTime datetime, String type, String status, String description, AtomicReference<BigDecimal> currentBalance) {
+    }
 }
