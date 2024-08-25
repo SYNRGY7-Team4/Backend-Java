@@ -27,6 +27,9 @@ public class SendOTPController {
 
     @PostMapping("/send-otp")
     public ResponseEntity<BaseResponse<Void>> sendOtp(@Valid @RequestBody OtpRequest request) {
+        // Log detail request yang masuk
+        System.out.println("Request diterima - Email: " + request.getEmail() + ", Nomor Telepon: " + request.getNoHP());
+
         try {
             otpService.sendOtp(request.getEmail(), request.getNoHP());
 
@@ -47,7 +50,6 @@ public class SendOTPController {
                     .build(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
 
 

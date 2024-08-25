@@ -18,7 +18,7 @@ public class OtpRequest {
     @NotBlank(message = "Email cannot be empty")
     private String email;
 
-    @NotBlank(message = "Phone Number cannot be empty")
+    @NotBlank(message = "Phone number cannot be empty")
     @Pattern(regexp = "\\d{11,13}", message = "Phone number must be between 11 and 13 digits")
     private String noHP;
 }
