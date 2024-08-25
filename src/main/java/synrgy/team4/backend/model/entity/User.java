@@ -42,8 +42,7 @@ public class User extends BaseModel implements UserDetails {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
-
-    @Lob
+    
     @Column(name = "ektp_photo")
     private String ektpPhoto;
 

@@ -48,8 +48,6 @@ public class TransactionServiceImpl implements TransactionService {
 
         List<Transaction> transactions = transactionRepository.findByAccountFromAccountNumberOrAccountToAccountNumber(accountNumber, accountNumber);
 
-        AtomicReference<BigDecimal> currentBalance = new AtomicReference<>(account.getBalance());
-
         List<MutationResponse> mutationResponses = transactions.stream()
                 .map(transaction -> new MutationResponse(
                             transaction.getId(),
@@ -93,7 +91,7 @@ public class TransactionServiceImpl implements TransactionService {
                         transaction.getStatus(),
                         transaction.getDescription(),
                         transaction.getCurrentBalance()
-                ))
+                    ))
                 .collect(Collectors.toList());
 
         return BaseResponse.<List<MutationResponse>>builder()
