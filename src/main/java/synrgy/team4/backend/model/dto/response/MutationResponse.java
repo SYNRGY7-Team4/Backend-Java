@@ -22,13 +22,11 @@ public class MutationResponse {
     private String accountFrom;
     @JsonProperty("username_from")
     private String nameAccountFrom;
-    private String accountFromType;
 
     @JsonProperty("account_to")
     private String accountTo;
     @JsonProperty("username_to")
     private String nameAccountTo;
-    private String accountToType;
 
     private BigDecimal amount;
     private LocalDateTime datetime;
@@ -36,4 +34,5 @@ public class MutationResponse {
     private String status;
     private String description;
     private BigDecimal currentBalance;
+    private String transactionDirection;
 }

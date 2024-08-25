@@ -49,21 +49,20 @@ public class TransactionServiceImpl implements TransactionService {
         List<Transaction> transactions = transactionRepository.findByAccountFromAccountNumberOrAccountToAccountNumber(accountNumber, accountNumber);
 
         List<MutationResponse> mutationResponses = transactions.stream()
-                .map(transaction -> new MutationResponse(
-                            transaction.getId(),
-                            transaction.getAccountFrom().getAccountNumber(),
-                            transaction.getAccountFrom().getUser().getName(),
-                            transaction.getAccountFromType(),
-                            transaction.getAccountTo().getAccountNumber(),
-                            transaction.getAccountTo().getUser().getName(),
-                            transaction.getAccountToType(),
-                            transaction.getAmount(),
-                            transaction.getDatetime(),
-                            transaction.getType(),
-                            transaction.getStatus(),
-                            transaction.getDescription(),
-                            transaction.getCurrentBalance()
-                    ))
+                .map(transaction -> MutationResponse.builder()
+                        .id(transaction.getId())
+                        .accountFrom(transaction.getAccountFrom().getAccountNumber())
+                        .nameAccountFrom(transaction.getAccountFrom().getUser().getName())
+                        .accountTo(transaction.getAccountTo().getAccountNumber())
+                        .nameAccountTo(transaction.getAccountTo().getUser().getName())
+                        .amount(transaction.getAmount())
+                        .datetime(transaction.getDatetime())
+                        .type(transaction.getType())
+                        .status(transaction.getStatus())
+                        .description(transaction.getDescription())
+                        .currentBalance(transaction.getCurrentBalance())
+                        .transactionDirection(transaction.getAccountFrom().getAccountNumber().equals(accountNumber) ? "CREDIT" : "DEBIT")  // Determine direction
+                        .build())
                 .collect(Collectors.toList());
 
         return BaseResponse.<List<MutationResponse>>builder()
@@ -81,21 +80,20 @@ public class TransactionServiceImpl implements TransactionService {
         List<Transaction> transactions = transactionRepository.findByDatetimeBetweenAndType(startDate, endDate, type);
 
         List<MutationResponse> mutationResponses = transactions.stream()
-                .map(transaction -> new MutationResponse(
-                        transaction.getId(),
-                        transaction.getAccountFrom().getAccountNumber(),
-                        transaction.getAccountFrom().getUser().getName(),
-                        transaction.getAccountFromType(),
-                        transaction.getAccountTo().getAccountNumber(),
-                        transaction.getAccountTo().getUser().getName(),
-                        transaction.getAccountToType(),
-                        transaction.getAmount(),
-                        transaction.getDatetime(),
-                        transaction.getType(),
-                        transaction.getStatus(),
-                        transaction.getDescription(),
-                        transaction.getCurrentBalance()
-                    ))
+                .map(transaction -> MutationResponse.builder()
+                        .id(transaction.getId())
+                        .accountFrom(transaction.getAccountFrom().getAccountNumber())
+                        .nameAccountFrom(transaction.getAccountFrom().getUser().getName())
+                        .accountTo(transaction.getAccountTo().getAccountNumber())
+                        .nameAccountTo(transaction.getAccountTo().getUser().getName())
+                        .amount(transaction.getAmount())
+                        .datetime(transaction.getDatetime())
+                        .type(transaction.getType())
+                        .status(transaction.getStatus())
+                        .description(transaction.getDescription())
+                        .currentBalance(transaction.getCurrentBalance())
+                        .transactionDirection(transaction.getAccountFrom().getAccountNumber().equals(accountNumber) ? "CREDIT" : "DEBIT")
+                        .build())
                 .collect(Collectors.toList());
 
         return BaseResponse.<List<MutationResponse>>builder()
@@ -165,9 +163,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         Transaction transaction = Transaction.builder()
                 .accountFrom(accountFrom)
-                .accountFromType("credit")
                 .accountTo(accountTo)
-                .accountToType("debit")
                 .amount(amount)
                 .datetime(dateTime != null ? dateTime : LocalDateTime.now().plusSeconds(10))
                 .createdAt(LocalDateTime.now())

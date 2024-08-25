@@ -38,7 +38,8 @@ public class TransactionController {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         List<Account> accounts = userDetails.getAccounts();
         Account account = accounts.stream()
-                .filter(acc -> acc.getAccountNumber().equals(accountNumber))
+                .filter(acc -> acc.getAccountNumber()
+                        .equals(accountNumber))
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to access this account."));
 
@@ -56,7 +57,8 @@ public class TransactionController {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         List<Account> accounts = userDetails.getAccounts();
         Account account = accounts.stream()
-                .filter(acc -> acc.getAccountNumber().equals(accountNumber))
+                .filter(acc -> acc.getAccountNumber()
+                        .equals(accountNumber))
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to access this account."));
 
@@ -64,7 +66,8 @@ public class TransactionController {
         LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
 
         BaseResponse<List<MutationResponse>> response = transactionService.getMutationsByDate(accountNumber, startDateTime, endDateTime, type);
-        return ResponseEntity.ok(response).getBody();
+        return ResponseEntity.ok(response)
+                .getBody();
     }
 
     @GetMapping("/mutation")
@@ -76,26 +79,33 @@ public class TransactionController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
 
         Account account = accounts.stream()
-                .filter(acc -> acc.getAccountNumber().equals(transaction.getAccountFrom().getAccountNumber()) ||
-                        acc.getAccountNumber().equals(transaction.getAccountTo().getAccountNumber()))
+                .filter(acc -> acc.getAccountNumber()
+                        .equals(transaction.getAccountFrom()
+                                .getAccountNumber()) ||
+                        acc.getAccountNumber()
+                                .equals(transaction.getAccountTo()
+                                        .getAccountNumber()))
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to access this transaction."));
 
-        MutationResponse mutationResponse = new MutationResponse(
-                transaction.getId(),
-                transaction.getAccountFrom().getAccountNumber(),
-                transaction.getAccountFrom().getUser().getName(),
-                transaction.getAccountFromType(),
-                transaction.getAccountTo().getAccountNumber(),
-                transaction.getAccountTo().getUser().getName(),
-                transaction.getAccountToType(),
-                transaction.getAmount(),
-                transaction.getDatetime(),
-                transaction.getType(),
-                transaction.getStatus(),
-                transaction.getDescription(),
-                transaction.getCurrentBalance()
-        );
+        MutationResponse mutationResponse = new MutationResponse();
+        mutationResponse.setId(transaction.getId());
+        mutationResponse.setAccountFrom(transaction.getAccountFrom()
+                .getAccountNumber());
+        mutationResponse.setNameAccountFrom(transaction.getAccountFrom()
+                .getUser()
+                .getName());
+        mutationResponse.setAccountTo(transaction.getAccountTo()
+                .getAccountNumber());
+        mutationResponse.setNameAccountTo(transaction.getAccountTo()
+                .getUser()
+                .getName());
+        mutationResponse.setAmount(transaction.getAmount());
+        mutationResponse.setDatetime(transaction.getDatetime());
+        mutationResponse.setType(transaction.getType());
+        mutationResponse.setStatus(transaction.getStatus());
+        mutationResponse.setDescription(transaction.getDescription());
+        mutationResponse.setCurrentBalance(transaction.getCurrentBalance());
 
         return BaseResponse.<MutationResponse>builder()
                 .success(true)
@@ -112,7 +122,8 @@ public class TransactionController {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         List<Account> accounts = userDetails.getAccounts();
         Account account = accounts.stream()
-                .filter(acc -> acc.getAccountNumber().equals(request.getAccountFrom()))
+                .filter(acc -> acc.getAccountNumber()
+                        .equals(request.getAccountFrom()))
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to access this account."));
 
@@ -122,18 +133,22 @@ public class TransactionController {
 
         Transaction transaction = transactionService.makeTransaction(request.getAccountFrom(), request.getAccountTo(), request.getAmount(), request.getDescription(), "completed", null, request.getDestinationBank());
 
-        String userAccountFrom = transaction.getAccountFrom().getUser().getName();
-        String userAccountTo = transaction.getAccountTo().getUser().getName();
+        String userAccountFrom = transaction.getAccountFrom()
+                .getUser()
+                .getName();
+        String userAccountTo = transaction.getAccountTo()
+                .getUser()
+                .getName();
 
         TransactionResponse transactionResponse = new TransactionResponse();
         transactionResponse.setCreatedAt(transaction.getCreatedAt());
         transactionResponse.setId(transaction.getId());
         transactionResponse.setReferenceNumber(transaction.getReferenceNumber());
-        transactionResponse.setAccountFrom(transaction.getAccountFrom().getAccountNumber());
-        transactionResponse.setAccountFromType(transaction.getAccountFromType());
+        transactionResponse.setAccountFrom(transaction.getAccountFrom()
+                .getAccountNumber());
         transactionResponse.setNameAccountFrom(userAccountFrom);
-        transactionResponse.setAccountTo(transaction.getAccountTo().getAccountNumber());
-        transactionResponse.setAccountToType(transaction.getAccountToType());
+        transactionResponse.setAccountTo(transaction.getAccountTo()
+                .getAccountNumber());
         transactionResponse.setNameAccountTo(userAccountTo);
         transactionResponse.setDestinationBank(transaction.getDestinationBank());
         transactionResponse.setAmount(transaction.getAmount());
@@ -158,7 +173,8 @@ public class TransactionController {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         List<Account> accounts = userDetails.getAccounts();
         Account account = accounts.stream()
-                .filter(acc -> acc.getAccountNumber().equals(request.getAccountFrom()))
+                .filter(acc -> acc.getAccountNumber()
+                        .equals(request.getAccountFrom()))
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to access this account."));
 
@@ -172,12 +188,16 @@ public class TransactionController {
         transactionResponse.setCreatedAt(transaction.getCreatedAt());
         transactionResponse.setId(transaction.getId());
         transactionResponse.setReferenceNumber(transaction.getReferenceNumber());
-        transactionResponse.setAccountFrom(transaction.getAccountFrom().getAccountNumber());
-        transactionResponse.setAccountFromType(transaction.getAccountFromType());
-        transactionResponse.setNameAccountFrom(transaction.getAccountFrom().getUser().getName());
-        transactionResponse.setAccountTo(transaction.getAccountTo().getAccountNumber());
-        transactionResponse.setAccountToType(transaction.getAccountToType());
-        transactionResponse.setNameAccountTo(transaction.getAccountTo().getUser().getName());
+        transactionResponse.setAccountFrom(transaction.getAccountFrom()
+                .getAccountNumber());
+        transactionResponse.setNameAccountFrom(transaction.getAccountFrom()
+                .getUser()
+                .getName());
+        transactionResponse.setAccountTo(transaction.getAccountTo()
+                .getAccountNumber());
+        transactionResponse.setNameAccountTo(transaction.getAccountTo()
+                .getUser()
+                .getName());
         transactionResponse.setDestinationBank(transaction.getDestinationBank());
         transactionResponse.setAmount(transaction.getAmount());
         transactionResponse.setDatetime(transaction.getDatetime());
