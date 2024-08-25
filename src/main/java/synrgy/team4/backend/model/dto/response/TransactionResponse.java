@@ -14,10 +14,8 @@ public class TransactionResponse {
     private UUID id;
     private String referenceNumber;
     private String accountFrom;
-    private String accountFromType;
     private String nameAccountFrom;
     private String accountTo;
-    private String accountToType;
     private String nameAccountTo;
     private String destinationBank;
     private BigDecimal amount;
