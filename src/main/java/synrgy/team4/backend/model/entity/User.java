@@ -43,8 +43,7 @@ public class User extends BaseModel implements UserDetails {
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
 
-    @Lob
-    @Column(name = "ektp_photo")
+    @Column(name = "ektp_photo", columnDefinition = "MEDIUMTEXT")
     private String ektpPhoto;
 
     @Schema(example = "passworduser1")
