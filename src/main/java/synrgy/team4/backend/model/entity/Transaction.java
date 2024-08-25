@@ -23,9 +23,13 @@ public class Transaction {
     @JoinColumn(name = "account_from", referencedColumnName = "account_number")
     private Account accountFrom;
 
+    private String accountFromType;
+
     @ManyToOne
     @JoinColumn(name = "account_to", referencedColumnName = "account_number")
     private Account accountTo;
+
+    private String accountToType;
 
     private BigDecimal amount;
     private LocalDateTime datetime;

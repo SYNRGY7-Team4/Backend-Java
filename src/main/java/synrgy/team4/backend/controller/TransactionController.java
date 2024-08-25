@@ -128,8 +128,10 @@ public class TransactionController {
         transactionResponse.setId(transaction.getId());
         transactionResponse.setReferenceNumber(transaction.getReferenceNumber());
         transactionResponse.setAccountFrom(transaction.getAccountFrom().getAccountNumber());
+        transactionResponse.setAccountFromType(transaction.getAccountFromType());
         transactionResponse.setNameAccountFrom(userAccountFrom);
         transactionResponse.setAccountTo(transaction.getAccountTo().getAccountNumber());
+        transactionResponse.setAccountToType(transaction.getAccountToType());
         transactionResponse.setNameAccountTo(userAccountTo);
         transactionResponse.setDestinationBank(transaction.getDestinationBank());
         transactionResponse.setAmount(transaction.getAmount());
@@ -169,8 +171,10 @@ public class TransactionController {
         transactionResponse.setId(transaction.getId());
         transactionResponse.setReferenceNumber(transaction.getReferenceNumber());
         transactionResponse.setAccountFrom(transaction.getAccountFrom().getAccountNumber());
+        transactionResponse.setAccountFromType(transaction.getAccountFromType());
         transactionResponse.setNameAccountFrom(transaction.getAccountFrom().getUser().getName());
         transactionResponse.setAccountTo(transaction.getAccountTo().getAccountNumber());
+        transactionResponse.setAccountToType(transaction.getAccountToType());
         transactionResponse.setNameAccountTo(transaction.getAccountTo().getUser().getName());
         transactionResponse.setDestinationBank(transaction.getDestinationBank());
         transactionResponse.setAmount(transaction.getAmount());

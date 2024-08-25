@@ -161,7 +161,9 @@ public class TransactionServiceImpl implements TransactionService {
 
         Transaction transaction = Transaction.builder()
                 .accountFrom(accountFrom)
+                .accountFromType("credit")
                 .accountTo(accountTo)
+                .accountToType("debit")
                 .amount(amount)
                 .datetime(dateTime != null ? dateTime : LocalDateTime.now().plusSeconds(10))
                 .createdAt(LocalDateTime.now())
