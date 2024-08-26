@@ -13,4 +13,5 @@ public class AccountListResponse {
     private UUID id;
     private String name;
     private String accountNumber;
+    private String destinationBank;
 }

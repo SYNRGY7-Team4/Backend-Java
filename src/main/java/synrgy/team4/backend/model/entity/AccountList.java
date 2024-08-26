@@ -24,4 +24,7 @@ public class AccountList {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "saved_account_id", referencedColumnName = "id")
     private Account savedAccount;
+
+    @Column(name = "destination_bank")
+    private String destinationBank;
 }

@@ -50,6 +50,7 @@ public class AccountListServiceImpl implements AccountListService {
         AccountList accountList = AccountList.builder()
                 .owner(owner)
                 .savedAccount(savedAccount)
+                .destinationBank("LUMI BANK")
                 .build();
 
         accountListRepository.save(accountList);
@@ -66,6 +67,7 @@ public class AccountListServiceImpl implements AccountListService {
                         .id(accountList.getSavedAccount().getId())  // Include the ID in the response
                         .accountNumber(accountList.getSavedAccount().getAccountNumber())
                         .name(accountList.getSavedAccount().getUser().getName())
+                        .destinationBank("LUMI BANK")
                         .build())
                 .collect(Collectors.toList());
     }
