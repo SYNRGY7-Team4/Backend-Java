@@ -116,6 +116,11 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional
     public Transaction makeTransaction(String accountFromNumber, String accountToNumber, BigDecimal amount, String description, String status, LocalDateTime dateTime, String destinationBank) {
+        // Validasi schedule yang ditetapkan tidak kurang dari current time
+        if (dateTime != null && dateTime.isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Scheduled datetime cannot be in the past");
+        }
+
         Account accountFrom = accountRepository.findByAccountNumber(accountFromNumber)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Source account not found"));
         Account accountTo = accountRepository.findByAccountNumber(accountToNumber)
